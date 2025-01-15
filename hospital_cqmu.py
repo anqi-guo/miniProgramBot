@@ -77,8 +77,7 @@ class Hospital:
         dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
         for date in dates:
             if "有号" in date.text:
-                print(date.text)
-                # TODO reserve
+                self.reserve(date)
                 return
 
         swipe_y = dates[3].rect['y'] + dates[3].rect['height'] * 0.5
@@ -86,11 +85,20 @@ class Hospital:
         dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
         for date in dates[-2:]:
             if "有号" in date.text:
-                print(date.text)
-                # TODO reserve
+                self.reserve(date)
                 return
 
         # TODO refresh
+
+    def reserve(self, date):
+        # click date that has slots
+        date.click()
+        # click the first slot
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "余 ")]')))
+        self.driver.find_element(By.XPATH, '//*[contains(@text, "余 ")]').click()
+        # click 初诊
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text, "{DOCTOR}")]')))
+        self.driver.find_element(By.XPATH, '//*[contains(@text,"初诊")]').click()
 
 if __name__ == "__main__":
     hospital = Hospital()
