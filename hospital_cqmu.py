@@ -56,8 +56,45 @@ class Hospital:
         elements = self.driver.find_elements(By.XPATH, f'//*[@text="{SUBDEPARTMENT}"]')
         elements[-1].click()
 
+    def check_availability(self):
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text,"{SUBDEPARTMENT}")]')))
+        # 只看有号
+        #self.driver.find_element(By.XPATH, '//*[@text="只看有号"]/following-sibling::*').click()
+        # click the doctor
+        # while True:
+        #     try:
+        #         self.driver.find_element(By.XPATH, f'//*[contains(@text,"{DOCTOR}")]').click()
+        #         break
+        #     except NoSuchElementException:
+        #         self.driver.swipe(
+        #             self.size['width'] * 0.5,
+        #             self.size['height'] * 0.9,
+        #             self.size['width'] * 0.5,
+        #             self.size['height'] * 0.1
+        #         )
+
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text,"{DOCTOR}")]')))
+        dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
+        for date in dates:
+            if "有号" in date.text:
+                print(date.text)
+                # TODO reserve
+                return
+
+        swipe_y = dates[3].rect['y'] + dates[3].rect['height'] * 0.5
+        self.driver.swipe(self.size['width'] * 0.9, swipe_y, self.size['width'] * 0.1, swipe_y)
+        dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
+        for date in dates[-2:]:
+            if "有号" in date.text:
+                print(date.text)
+                # TODO reserve
+                return
+
+        # TODO refresh
+
 if __name__ == "__main__":
     hospital = Hospital()
     #hospital.to_hospital()
-    hospital.to_department()
+    #hospital.to_department()
+    hospital.check_availability()
     print(1)
