@@ -91,7 +91,9 @@ class Hospital:
                 self.reserve(date)
                 return
 
-        self.search_again()
+        # search again
+        self.driver.back()
+        self.search()
 
     def reserve(self, date):
         # click date that has slots
@@ -182,19 +184,13 @@ class Hospital:
                 self.refresh_image()
                 self.send_verification_code()
 
-    def search_again(self):
-        self.driver.back()
-        self.to_department()
-        self.check_availability()
-        self.to_confirm()
-
-    def run(self):
-        self.to_hospital()
+    def search(self):
         self.to_department()
         self.check_availability()
         self.to_confirm()
 
 if __name__ == "__main__":
     hospital = Hospital()
-    hospital.run()
+    hospital.to_hospital()
+    hospital.search()
     print(1)
