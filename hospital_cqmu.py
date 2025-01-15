@@ -3,11 +3,14 @@ import os
 import ast
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
+from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 import time
+import requests
+import easyocr
 
 load_dotenv()
 HOSPITAL = os.getenv("HOSPITAL")
@@ -57,21 +60,21 @@ class Hospital:
         elements[-1].click()
 
     def check_availability(self):
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text,"{SUBDEPARTMENT}")]')))
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text,"只看有号")]')))
         # 只看有号
-        #self.driver.find_element(By.XPATH, '//*[@text="只看有号"]/following-sibling::*').click()
+        self.driver.find_element(By.XPATH, '//*[@text="只看有号"]/following-sibling::*').click()
         # click the doctor
-        # while True:
-        #     try:
-        #         self.driver.find_element(By.XPATH, f'//*[contains(@text,"{DOCTOR}")]').click()
-        #         break
-        #     except NoSuchElementException:
-        #         self.driver.swipe(
-        #             self.size['width'] * 0.5,
-        #             self.size['height'] * 0.9,
-        #             self.size['width'] * 0.5,
-        #             self.size['height'] * 0.1
-        #         )
+        while True:
+            try:
+                self.driver.find_element(By.XPATH, f'//*[contains(@text,"{DOCTOR}")]').click()
+                break
+            except NoSuchElementException:
+                self.driver.swipe(
+                    self.size['width'] * 0.5,
+                    self.size['height'] * 0.9,
+                    self.size['width'] * 0.5,
+                    self.size['height'] * 0.1
+                )
 
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text,"{DOCTOR}")]')))
         dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
@@ -99,6 +102,63 @@ class Hospital:
         # click 初诊
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text, "{DOCTOR}")]')))
         self.driver.find_element(By.XPATH, '//*[contains(@text,"初诊")]').click()
+        # switch to webview
+        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
+        for i, window in enumerate(self.driver.window_handles):
+            self.driver.switch_to.window(window)
+            if self.driver.title == '预约信息':
+                break
+        while True:
+            try:
+                # send verification code
+                self.send_verification_code()
+                # click confirm
+                time.sleep(10)
+                self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+                self.refresh_image()
+            except NoSuchElementException:
+                break
+
+    def refresh_image(self):
+        self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
+
+    def send_verification_code(self):
+        # get the image
+        while True:
+            try:
+                broken_image = self.driver.find_element(By.XPATH, '//*[contains(@class,"van-image__error")]')
+                broken_image.click()
+            except NoSuchElementException:
+                image = self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1]
+                break
+
+        image_url = image.get_attribute('src')
+        print('image_url:', image_url)
+
+        # download the image
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+
+        response = requests.get(image_url, headers=headers, stream=True)
+        if response.status_code == 200:
+            with open("image.jpg", "wb") as file:
+                for chunk in response.iter_content(1024):
+                    file.write(chunk)
+            print("Image downloaded successfully!")
+        else:
+            print(f"Failed to retrieve the image. Status code: {response.status_code}")
+
+        # OCR
+        reader = easyocr.Reader(['en'])
+        result = reader.readtext('image.jpg')
+        code = result[0][1]
+
+        # send the code
+        input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
+        input_area.send_keys(Keys.COMMAND + "a")
+        input_area.send_keys(Keys.DELETE)
+        input_area.send_keys(code)
 
 if __name__ == "__main__":
     hospital = Hospital()
