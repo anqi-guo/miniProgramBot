@@ -99,15 +99,25 @@ class Hospital:
         # click the first slot
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "余 ")]')))
         self.driver.find_element(By.XPATH, '//*[contains(@text, "余 ")]').click()
-        # click 初诊
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text, "{DOCTOR}")]')))
-        self.driver.find_element(By.XPATH, '//*[contains(@text,"初诊")]').click()
+        # confirm
+        self.to_confirm()
+
+    def switch(self):
         # switch to webview
         self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         for i, window in enumerate(self.driver.window_handles):
             self.driver.switch_to.window(window)
             if self.driver.title == '预约信息':
                 break
+
+    def to_confirm(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "初诊")]')))
+        # click 初诊
+        self.driver.find_element(By.XPATH, '//*[contains(@text, "初诊")]').click()
+
+        self.switch()
+
         while True:
             try:
                 # send verification code
@@ -123,15 +133,17 @@ class Hospital:
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
 
     def send_verification_code(self):
+        self.switch()
         # get the image
         while True:
             try:
                 broken_image = self.driver.find_element(By.XPATH, '//*[contains(@class,"van-image__error")]')
                 broken_image.click()
+                time.sleep(1)
             except NoSuchElementException:
-                image = self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1]
                 break
 
+        image = self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1]
         image_url = image.get_attribute('src')
         print('image_url:', image_url)
 
@@ -151,18 +163,31 @@ class Hospital:
 
         # OCR
         reader = easyocr.Reader(['en'])
-        result = reader.readtext('image.jpg')
-        code = result[0][1]
+        result = reader.readtext('image.jpg', allowlist ='0123456789')
 
-        # send the code
-        input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
-        input_area.send_keys(Keys.COMMAND + "a")
-        input_area.send_keys(Keys.DELETE)
-        input_area.send_keys(code)
+        while True:
+            try:
+                code = result[0][1]
+                if len(code) == 4:
+                    # send the code
+                    input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
+                    input_area.send_keys(Keys.COMMAND + "a")
+                    input_area.send_keys(Keys.DELETE)
+                    input_area.send_keys(code)
+                    break
+                else:
+                    self.refresh_image()
+                    self.send_verification_code()
+            except IndexError:
+                self.refresh_image()
+                self.send_verification_code()
+
 
 if __name__ == "__main__":
     hospital = Hospital()
     #hospital.to_hospital()
     #hospital.to_department()
-    hospital.check_availability()
+    #hospital.check_availability()
+    #hospital.to_confirm()
+    hospital.send_verification_code()
     print(1)
