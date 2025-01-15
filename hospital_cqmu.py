@@ -29,6 +29,8 @@ class Hospital:
         self.size = self.driver.get_window_size()
 
     def to_hospital(self):
+        print(self.driver.contexts)
+        #self.switch()
         # click 门诊挂号
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@text="门诊挂号"]')))
         self.driver.find_element(By.XPATH, '//*[@text="门诊挂号"]').click()
@@ -126,7 +128,7 @@ class Hospital:
                 self.send_verification_code()
                 time.sleep(1)
                 # click confirm
-                self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+                #self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
                 # if it fails to go to the next page then refresh the image
                 self.refresh_image()
             except NoSuchElementException:
@@ -136,7 +138,6 @@ class Hospital:
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
 
     def send_verification_code(self):
-        self.switch()
         # get the image
         while True:
             try:
@@ -145,8 +146,7 @@ class Hospital:
                 broken_image = self.driver.find_element(By.XPATH, '//*[contains(@class,"van-image__error")]')
                 broken_image.click()
             except NoSuchElementException:
-                if "default" not in self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].get_attribute('src'):
-                    break
+                break
 
         # wait for image to load
         time.sleep(1)
