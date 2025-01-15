@@ -116,9 +116,9 @@ class Hospital:
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "初诊")]')))
         # click 初诊
-        # self.driver.find_element(By.XPATH, '//*[contains(@text, "初诊")]').click()
-        #
-        # self.switch()
+        self.driver.find_element(By.XPATH, '//*[contains(@text, "初诊")]').click()
+
+        self.switch()
 
         while True:
             try:
