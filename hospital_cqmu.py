@@ -29,7 +29,6 @@ class Hospital:
         self.size = self.driver.get_window_size()
 
     def to_hospital(self):
-        print(self.driver.contexts)
         #self.switch()
         # click 门诊挂号
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@text="门诊挂号"]')))
@@ -38,7 +37,7 @@ class Hospital:
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@text="本部院区"]')))
         self.driver.find_element(By.XPATH, f'//*[@text="{HOSPITAL}"]').click()
         # click 确定
-        time.sleep(6)
+        time.sleep(5)
         self.driver.find_element(By.XPATH, '//*[contains(@text,"阅读并同意挂号预约须知")]').click()
         self.driver.find_element(By.XPATH, '//*[@text="确定"]').click()
 
@@ -63,8 +62,6 @@ class Hospital:
 
     def check_availability(self):
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text,"只看有号")]')))
-        # 只看有号
-        self.driver.find_element(By.XPATH, '//*[@text="只看有号"]/following-sibling::*').click()
         # click the doctor
         while True:
             try:
@@ -94,6 +91,7 @@ class Hospital:
                 return
 
         # search again
+        self.driver.back()
         self.driver.back()
         self.search()
 
