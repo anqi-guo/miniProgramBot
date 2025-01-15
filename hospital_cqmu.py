@@ -116,17 +116,19 @@ class Hospital:
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "初诊")]')))
         # click 初诊
-        self.driver.find_element(By.XPATH, '//*[contains(@text, "初诊")]').click()
-
-        self.switch()
+        # self.driver.find_element(By.XPATH, '//*[contains(@text, "初诊")]').click()
+        #
+        # self.switch()
 
         while True:
             try:
                 # send verification code
                 self.send_verification_code()
+                time.sleep(1)
                 # click confirm
-                time.sleep(10)
-                self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+                # self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+                # if it fails to go to the next page then refresh the image
+                print("refresh: code incorrect")
                 self.refresh_image()
             except NoSuchElementException:
                 break
@@ -139,15 +141,18 @@ class Hospital:
         # get the image
         while True:
             try:
+                # wait for image to load
+                time.sleep(1)
                 broken_image = self.driver.find_element(By.XPATH, '//*[contains(@class,"van-image__error")]')
                 broken_image.click()
-                time.sleep(1)
             except NoSuchElementException:
-                break
+                if "default" not in self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].get_attribute('src'):
+                    break
 
+        # wait for image to load
+        time.sleep(1)
         image = self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1]
         image_url = image.get_attribute('src')
-        print('image_url:', image_url)
 
         # download the image
         headers = {
@@ -159,30 +164,27 @@ class Hospital:
             with open("image.jpg", "wb") as file:
                 for chunk in response.iter_content(1024):
                     file.write(chunk)
-            print("Image downloaded successfully!")
-        else:
-            print(f"Failed to retrieve the image. Status code: {response.status_code}")
+            # OCR
+            reader = easyocr.Reader(['en'])
+            result = reader.readtext('image.jpg', allowlist='0123456789')
 
-        # OCR
-        reader = easyocr.Reader(['en'])
-        result = reader.readtext('image.jpg', allowlist ='0123456789')
-
-        while True:
-            try:
+            if not result: # fail to identify anything
+                self.refresh_image()
+                self.send_verification_code()
+            else:
                 code = result[0][1]
-                if len(code) == 4:
+                if len(code) >= 4:
                     # send the code
                     input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
                     input_area.send_keys(Keys.COMMAND + "a")
                     input_area.send_keys(Keys.DELETE)
-                    input_area.send_keys(code)
-                    break
-                else:
+                    input_area.send_keys(code[-4:])
+                else: # fail to identify 4 digits
                     self.refresh_image()
                     self.send_verification_code()
-            except IndexError:
-                self.refresh_image()
-                self.send_verification_code()
+        else: # fail to retrieve the image
+            self.refresh_image()
+            self.send_verification_code()
 
     def search(self):
         self.to_department()
@@ -193,4 +195,3 @@ if __name__ == "__main__":
     hospital = Hospital()
     hospital.to_hospital()
     hospital.search()
-    print(1)
