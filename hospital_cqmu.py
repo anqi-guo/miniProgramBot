@@ -16,3 +16,7 @@ class Hospital:
             options=UiAutomator2Options().load_capabilities(CAPS)
         )
         self.size = self.driver.get_window_size()
+
+if __name__ == "__main__":
+    hospital = Hospital()
+    print(1)
