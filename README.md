@@ -1,11 +1,11 @@
 ## Setup Instruction
-1. android phone in development mode
-2. wire connect phone to computer
-3. run "adb devices" in terminal to make sure the phone is successfully connected
-4. start session on Appium Inspector
+### Android Device or Emulator
+1. Android phone in development mode connect phone to computer or start an emulator
+2. Run "adb devices" in terminal to make sure the phone or emulator is successfully connected
+3. Start session on Appium Inspector
 
 ## Wechat Instruction
-1. wechat open http://debugxweb.qq.com/?inspector=true
-2. go to homepage of the mini program
-3. manually click "confirm" on homepage and log in to the mini program in advance
-4. go back to homepage of the mini program
+1. Wechat open http://debugxweb.qq.com/?inspector=true
+2. Go to homepage of the mini program
+3. Manually click "confirm" on homepage and log in to the mini program in advance
+4. Go back to homepage of the mini program
