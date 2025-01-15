@@ -126,9 +126,8 @@ class Hospital:
                 self.send_verification_code()
                 time.sleep(1)
                 # click confirm
-                # self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+                self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
                 # if it fails to go to the next page then refresh the image
-                print("refresh: code incorrect")
                 self.refresh_image()
             except NoSuchElementException:
                 break
