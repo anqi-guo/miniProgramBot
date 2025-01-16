@@ -118,6 +118,7 @@ class Hospital:
 
     def switch(self):
         # switch to webview
+        print(self.driver.contexts)
         self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         for i, window in enumerate(self.driver.window_handles):
             self.driver.switch_to.window(window)
@@ -125,12 +126,11 @@ class Hospital:
                 break
 
     def to_confirm(self):
-        WebDriverWait(self.driver, 100).until(
-            EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "初诊")]')))
-        # click 初诊
-        self.driver.find_element(By.XPATH, '//*[contains(@text, "初诊")]').click()
-
         self.switch()
+        WebDriverWait(self.driver, 100).until(
+            EC.presence_of_element_located((By.XPATH, '//span[text()="初诊"]')))
+        # click 初诊
+        self.driver.find_element("xpath", "//span[text()='初诊']").click()
 
         while True:
             try:
