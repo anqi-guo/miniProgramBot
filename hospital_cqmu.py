@@ -47,7 +47,9 @@ class Hospital:
             lambda driver: driver.find_element(By.XPATH, "//span[text()='(0s)']").get_attribute(
                 "style") == "display: none;"
         )
+        # click checkbox
         self.driver.find_element(By.XPATH, "//span[text()='阅读并同意挂号预约须知']").click()
+        # click confirm
         self.driver.find_element(By.XPATH, "//button[.//div//span[text()='确定']]").click()
 
     def to_department(self):
