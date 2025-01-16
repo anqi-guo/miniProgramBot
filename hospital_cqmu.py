@@ -96,7 +96,10 @@ class Hospital:
         for span in doctor_elements:
             if span.text == DOCTOR:
                 span.click()
-                break
+                return
+
+        print("no doctor")
+        self.retry_search(back_attempts=1)
 
     def choose_time_page(self):
         self.switch_window("选择时间")
@@ -109,7 +112,8 @@ class Hospital:
                 self.booking_info_page()
                 return
 
-        self.search()
+        print("no slot")
+        self.retry_search(back_attempts=2)
 
     def booking_info_page(self):
         self.switch_window("预约信息")
@@ -196,6 +200,11 @@ class Hospital:
         self.choose_department_page()
         self.choose_doctor_page()
         self.choose_time_page()
+
+    def retry_search(self, back_attempts):
+        for i in range(back_attempts):
+            self.driver.back()
+        self.search()
 
     def switch_window(self, title):
         for i, window in enumerate(self.driver.window_handles):
