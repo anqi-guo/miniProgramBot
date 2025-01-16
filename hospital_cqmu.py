@@ -65,11 +65,17 @@ class Hospital:
         elements[-1].click()
 
     def check_availability(self):
-        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text,"只看有号")]')))
+        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
+        self.switch_window("选择医生")
+
+        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//span[@class="labelName" and text()="只看有号"]')))
+
         # click the doctor
         while True:
             try:
-                self.driver.find_element(By.XPATH, f'//*[contains(@text,"{DOCTOR}")]').click()
+                #self.driver.find_element(By.XPATH, f'//span[text()="{DOCTOR}"]').click()
+                doctor = self.driver.find_element(By.XPATH, f'//span[@class="name" and text()="{DOCTOR}"]')
+                self.driver.execute_script("arguments[0].click();", doctor)
                 break
             except NoSuchElementException:
                 self.driver.swipe(
@@ -79,54 +85,43 @@ class Hospital:
                     self.size['height'] * 0.1
                 )
 
-        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text,"{DOCTOR}")]')))
-        dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
-        for date in dates:
-            if "有号" in date.text:
-                self.reserve(date)
+        self.switch_window("选择时间")
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@role='tablist']")))
+        # Find the parent div with role="tablist"
+        tablist = self.driver.find_element(By.XPATH, "//div[@role='tablist']")
+        # Find all div elements with role="tab" inside the tablist
+        tabs = tablist.find_elements(By.XPATH, ".//div[@role='tab']")
+        # Loop through each tab and extract the relevant text
+        for tab in tabs:
+            status = tab.find_element(By.XPATH, ".//div[contains(@class, 'color3') or contains(@class, 'has')]").text
+            if status == "有号":
+                tab.click()
+                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'selectTimeBoxActive')]")))
+                self.driver.find_element(By.XPATH, "//div[contains(@class, 'selectTimeBoxActive')]").click()
+                self.to_confirm()
                 return
-
-        try:
-            swipe_y = dates[0].rect['y'] + dates[0].rect['height'] * 0.5
-            self.driver.swipe(self.size['width'] * 0.9, swipe_y, self.size['width'] * 0.1, swipe_y)
-            dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
-            for date in dates[-2:]:
-                if "有号" in date.text:
-                    self.reserve(date)
-                    return
-        except IndexError:
-            self.driver.back()
-            self.driver.back()
-            self.search()
-            return
 
         # search again
         self.driver.back()
         self.driver.back()
         self.search()
 
-    def reserve(self, date):
+    def reserve(self):
         #playsound()
         print("有号")
-        # click date that has slots
-        date.click()
         # click the first slot
         WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "余 ")]')))
         self.driver.find_element(By.XPATH, '//*[contains(@text, "余 ")]').click()
         # confirm
         self.to_confirm()
 
-    def switch(self):
-        # switch to webview
-        print(self.driver.contexts)
-        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
+    def switch_window(self, title):
         for i, window in enumerate(self.driver.window_handles):
             self.driver.switch_to.window(window)
-            if self.driver.title == '预约信息':
+            if self.driver.title == title:
                 break
 
     def to_confirm(self):
-        self.switch()
         WebDriverWait(self.driver, 100).until(
             EC.presence_of_element_located((By.XPATH, '//span[text()="初诊"]')))
         # click 初诊
