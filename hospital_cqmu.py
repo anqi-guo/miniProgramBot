@@ -31,10 +31,12 @@ class Hospital:
         self.search_cnt = 0
         self.first_type = True
 
-    def to_hospital(self):
+    def homepage(self):
         # click 门诊挂号
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@text="门诊挂号"]')))
         self.driver.find_element(By.XPATH, '//*[@text="门诊挂号"]').click()
+
+    def book_page(self):
         # # click 院区
         self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         self.switch_window("预约挂号")
@@ -52,7 +54,7 @@ class Hospital:
         # click confirm
         self.driver.find_element(By.XPATH, "//button[.//div//span[text()='确定']]").click()
 
-    def to_department(self):
+    def choose_department_page(self):
         self.switch_window("选择科室")
 
         WebDriverWait(self.driver, 100).until(
@@ -71,7 +73,7 @@ class Hospital:
                         return
         print("error")
 
-    def check_availability(self):
+    def choose_doctor_page(self):
         self.switch_window("选择科室")
         print("选择科室")
         #WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//span[@class="labelName" and text()="只看有号"]')))
@@ -82,6 +84,7 @@ class Hospital:
             if span.text == DOCTOR:
                 span.click()
 
+    def choose_time_page(self):
         self.switch_window("选择时间")
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@role='tablist']")))
         # Find the parent div with role="tablist"
@@ -95,7 +98,7 @@ class Hospital:
                 tab.click()
                 WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'selectTimeBoxActive')]")))
                 self.driver.find_element(By.XPATH, "//div[contains(@class, 'selectTimeBoxActive')]").click()
-                self.to_confirm()
+                self.booking_info_page()
                 return
 
         # search again
@@ -109,7 +112,7 @@ class Hospital:
             if self.driver.title == title:
                 break
 
-    def to_confirm(self):
+    def booking_info_page(self):
         self.switch_window("预约信息")
 
         WebDriverWait(self.driver, 100).until(
@@ -191,6 +194,7 @@ class Hospital:
     def search(self):
         self.search_cnt += 1
         print(self.search_cnt, time.ctime())
-        self.to_department()
-        self.check_availability()
+        self.choose_department_page()
+        self.choose_doctor_page()
+        self.choose_time_page()
 
