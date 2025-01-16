@@ -27,14 +27,15 @@ class Hospital:
         )
         # device window size
         self.size = self.driver.get_window_size()
+        self.search_cnt = 0
 
     def to_hospital(self):
         #self.switch()
         # click 门诊挂号
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@text="门诊挂号"]')))
+        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[@text="门诊挂号"]')))
         self.driver.find_element(By.XPATH, '//*[@text="门诊挂号"]').click()
         # click 院区
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@text="本部院区"]')))
+        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[@text="本部院区"]')))
         self.driver.find_element(By.XPATH, f'//*[@text="{HOSPITAL}"]').click()
         # click 确定
         time.sleep(5)
@@ -42,26 +43,38 @@ class Hospital:
         self.driver.find_element(By.XPATH, '//*[@text="确定"]').click()
 
     def to_department(self):
-        WebDriverWait(self.driver, 10).until(
+        WebDriverWait(self.driver, 100).until(
             EC.presence_of_element_located((By.XPATH, '//*[contains(@text,"产科门诊")]')))
         # click department
+        swipe_down_cnt = 0
         while True:
             try:
                 self.driver.find_element(By.XPATH, f'//*[@text="{DEPARTMENT}"]').click()
                 break
             except NoSuchElementException:
-                self.driver.swipe(
-                    self.size['width'] * 0.1,
-                    self.size['height'] * 0.9,
-                    self.size['width'] * 0.1,
-                    self.size['height'] * 0.6
-                )
+                if swipe_down_cnt <= 4:
+                    self.driver.swipe(
+                        self.size['width'] * 0.1,
+                        self.size['height'] * 0.9,
+                        self.size['width'] * 0.1,
+                        self.size['height'] * 0.6
+                    )
+                    swipe_down_cnt += 1
+                else:
+                    self.driver.swipe(
+                        self.size['width'] * 0.1,
+                        self.size['height'] * 0.1,
+                        self.size['width'] * 0.1,
+                        self.size['height'] * 0.9
+                    )
+                    swipe_down_cnt = 0
+
         # click subdepartment
         elements = self.driver.find_elements(By.XPATH, f'//*[@text="{SUBDEPARTMENT}"]')
         elements[-1].click()
 
     def check_availability(self):
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text,"只看有号")]')))
+        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text,"只看有号")]')))
         # click the doctor
         while True:
             try:
@@ -75,20 +88,26 @@ class Hospital:
                     self.size['height'] * 0.1
                 )
 
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text,"{DOCTOR}")]')))
+        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, f'//*[contains(@text,"{DOCTOR}")]')))
         dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
         for date in dates:
             if "有号" in date.text:
                 self.reserve(date)
                 return
 
-        swipe_y = dates[3].rect['y'] + dates[3].rect['height'] * 0.5
-        self.driver.swipe(self.size['width'] * 0.9, swipe_y, self.size['width'] * 0.1, swipe_y)
-        dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
-        for date in dates[-2:]:
-            if "有号" in date.text:
-                self.reserve(date)
-                return
+        try:
+            swipe_y = dates[0].rect['y'] + dates[0].rect['height'] * 0.5
+            self.driver.swipe(self.size['width'] * 0.9, swipe_y, self.size['width'] * 0.1, swipe_y)
+            dates = self.driver.find_elements(By.XPATH, '//*[contains(@text,"星期")]')
+            for date in dates[-2:]:
+                if "有号" in date.text:
+                    self.reserve(date)
+                    return
+        except IndexError:
+            self.driver.back()
+            self.driver.back()
+            self.search()
+            return
 
         # search again
         self.driver.back()
@@ -96,10 +115,12 @@ class Hospital:
         self.search()
 
     def reserve(self, date):
+        #playsound()
+        print("有号")
         # click date that has slots
         date.click()
         # click the first slot
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "余 ")]')))
+        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "余 ")]')))
         self.driver.find_element(By.XPATH, '//*[contains(@text, "余 ")]').click()
         # confirm
         self.to_confirm()
@@ -113,7 +134,7 @@ class Hospital:
                 break
 
     def to_confirm(self):
-        WebDriverWait(self.driver, 10).until(
+        WebDriverWait(self.driver, 100).until(
             EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "初诊")]')))
         # click 初诊
         self.driver.find_element(By.XPATH, '//*[contains(@text, "初诊")]').click()
@@ -126,11 +147,13 @@ class Hospital:
                 self.send_verification_code()
                 time.sleep(1)
                 # click confirm
-                #self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+                self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
                 # if it fails to go to the next page then refresh the image
                 self.refresh_image()
             except NoSuchElementException:
                 break
+            finally:
+                print("Done!")
 
     def refresh_image(self):
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
@@ -184,6 +207,8 @@ class Hospital:
             self.send_verification_code()
 
     def search(self):
+        self.search_cnt += 1
+        print(self.search_cnt, time.ctime())
         self.to_department()
         self.check_availability()
         self.to_confirm()
