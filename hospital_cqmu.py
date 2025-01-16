@@ -3,7 +3,6 @@ import os
 import ast
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
-from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,8 +11,6 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 import requests
 import easyocr
-from google.cloud import vision_v1
-import io
 
 load_dotenv()
 HOSPITAL = os.getenv("HOSPITAL")
@@ -21,6 +18,7 @@ DEPARTMENT = os.getenv("DEPARTMENT")
 SUBDEPARTMENT = os.getenv("SUBDEPARTMENT")
 DOCTOR = os.getenv("DOCTOR")
 CAPS = ast.literal_eval(os.getenv('CAPS'))
+HEADERS = ast.literal_eval(os.getenv("HEADERS"))
 
 class Hospital:
     def __init__(self):
@@ -31,45 +29,62 @@ class Hospital:
         # device window size
         self.size = self.driver.get_window_size()
         self.search_cnt = 0
-        self.first_type = True
+        self.first_send = True
+        self.reader = easyocr.Reader(["en"])
+
+    def wait_for_element(self, xpath=None, timeout=10, condition=None):
+        """Wait for an element to meet the specified condition."""
+        if condition:
+            WebDriverWait(self.driver, timeout).until(condition)
+            return
+        else:
+            return WebDriverWait(self.driver, timeout).until(EC.presence_of_element_located((By.XPATH, xpath)))
+
+
+    def click_element(self, xpath):
+        """Click an element after waiting for its presence."""
+        self.wait_for_element(xpath).click()
+
+    def send_keys_to_element(self, xpath, keys):
+        """Send keys to an input field."""
+        input_area = self.wait_for_element(xpath)
+        if not self.first_send:
+            input_area.send_keys(Keys.CONTROL + "a")
+            input_area.send_keys(Keys.DELETE)
+        input_area.send_keys(keys)
+        self.first_send = False
 
     def homepage(self):
         # click 门诊挂号
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@text="门诊挂号"]')))
-        self.driver.find_element(By.XPATH, '//*[@text="门诊挂号"]').click()
+        self.click_element('//*[@text="门诊挂号"]')
 
     def book_page(self):
         self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         self.switch_window("预约挂号")
         #print("预约挂号")
-        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, f'//span[text()="{HOSPITAL}"]')))
-        self.driver.find_element(By.XPATH, f'//span[text()="{HOSPITAL}"]').click()
+        self.click_element(f'//span[text()="{HOSPITAL}"]')
         # click 确定
         self.switch_window("预约挂号须知")
 
-        WebDriverWait(self.driver, 10).until(
-            lambda driver: driver.find_element(By.XPATH, "//span[text()='(0s)']").get_attribute(
-                "style") == "display: none;"
-        )
+        self.wait_for_element(condition=lambda driver: driver.find_element(By.XPATH, "//span[text()='(0s)']").get_attribute(
+                "style") == "display: none;")
+
         # click checkbox
-        self.driver.find_element(By.XPATH, "//span[text()='阅读并同意挂号预约须知']").click()
+        self.click_element("//span[text()='阅读并同意挂号预约须知']")
         # click confirm
-        self.driver.find_element(By.XPATH, "//button[.//div//span[text()='确定']]").click()
+        self.click_element("//button[.//div//span[text()='确定']]")
 
     def choose_department_page(self):
         self.switch_window("选择科室")
         #print("选择科室")
-        WebDriverWait(self.driver, 100).until(
-            EC.presence_of_element_located((By.XPATH, "//div[@class='leftNav van-sidebar']//a")))
-        # click department
-        a_elements = self.driver.find_elements(By.XPATH, "//div[@class='leftNav van-sidebar']//a")
-        for a in a_elements:
-            text = a.find_element(By.XPATH, ".//div[@class='van-sidebar-item__text']").text
-            if text == DEPARTMENT:
-                a.click()
-                span_elements = self.driver.find_elements(By.XPATH,
-                                                     "//div[@class='van-cell-group van-hairline--top-bottom']//div//div//span")
-                for span in span_elements:
+        self.wait_for_element(xpath="//div[@class='leftNav van-sidebar']//a")
+
+        department_elements = self.driver.find_elements(By.XPATH, "//div[@class='leftNav van-sidebar']//a")
+        for element in department_elements:
+            if element.find_element(By.XPATH, ".//div[@class='van-sidebar-item__text']").text == DEPARTMENT:
+                element.click()
+                subdepartment_elements = self.driver.find_elements(By.XPATH, "//div[@class='van-cell-group van-hairline--top-bottom']//div//div//span")
+                for span in subdepartment_elements:
                     if span.text == SUBDEPARTMENT:
                         span.click()
                         return
@@ -77,9 +92,8 @@ class Hospital:
     def choose_doctor_page(self):
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='one']//div//div//span[@class='name']")))
         #print("选择医生")
-        # Find all <span> elements with class 'name' using XPath
-        span_elements = self.driver.find_elements(By.XPATH, "//div[@class='one']//div//div//span[@class='name']")
-        for span in span_elements:
+        doctor_elements = self.driver.find_elements(By.XPATH, "//div[@class='one']//span[@class='name']")
+        for span in doctor_elements:
             if span.text == DOCTOR:
                 span.click()
                 break
@@ -87,58 +101,30 @@ class Hospital:
     def choose_time_page(self):
         self.switch_window("选择时间")
         #print("选择时间")
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@role='tablist']")))
-        # Find the parent div with role="tablist"
-        tablist = self.driver.find_element(By.XPATH, "//div[@role='tablist']")
-        # Find all div elements with role="tab" inside the tablist
-        tabs = tablist.find_elements(By.XPATH, ".//div[@role='tab']")
-        # Loop through each tab and extract the relevant text
-        for tab in tabs:
-            status = tab.find_element(By.XPATH, ".//div[contains(@class, 'color3') or contains(@class, 'has')]").text
-            if status == "有号":
+        tablist = self.wait_for_element("//div[@role='tablist']")
+        for tab in tablist.find_elements(By.XPATH, ".//div[@role='tab']"):
+            if "有号" in tab.text:
                 tab.click()
-                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'selectTimeBoxActive')]")))
-                self.driver.find_element(By.XPATH, "//div[contains(@class, 'selectTimeBoxActive')]").click()
+                self.wait_for_element("//div[contains(@class, 'selectTimeBoxActive')]").click()
                 self.booking_info_page()
                 return
 
-        # search again
-        self.driver.back()
-        self.driver.back()
         self.search()
-
-    def switch_window(self, title):
-        for i, window in enumerate(self.driver.window_handles):
-            self.driver.switch_to.window(window)
-            if self.driver.title == title:
-                break
 
     def booking_info_page(self):
         self.switch_window("预约信息")
         #print("预约信息")
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '//span[text()="初诊"]')))
-
-        checked = False
+        time.sleep(1)
+        self.click_element("//span[text()='初诊']")
         while True:
             try:
-                # send verification code
                 self.send_verification_code()
-                # click 初诊
-                if not checked:
-                    self.driver.find_element("xpath", "//span[text()='初诊']").click()
-                    checked = True
-                # click confirm
                 time.sleep(10)
-                self.driver.find_element(By.XPATH, "//button[div/span[text()='确认预约']]").click()
-                # if it fails to go to the next page then refresh the image
+                self.click_element("//button[.//span[text()='确认预约']]")
                 self.refresh_image()
             except Exception:
-                print("error")
                 self.driver.back()
                 self.choose_time_page()
-
-
 
     def refresh_image(self):
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
@@ -147,62 +133,62 @@ class Hospital:
         # get the image
         while True:
             try:
-                # wait for image to load
+                # step 1: check for broken image
                 time.sleep(1)
-                broken_image = self.driver.find_element(By.XPATH, '//*[contains(@class,"van-image__error")]')
-                #print("click broken page")
-                broken_image.click()
-                #print(1)
-            except Exception:
-                #print(2)
-                break
+                try:
+                    broken_image = self.driver.find_element(By.XPATH, '//*[contains(@class,"van-image__error")]')
+                    # step 2: refresh by clicking on the broken image
+                    broken_image.click()
+                    continue # restart loop for the refresh
+                except NoSuchElementException:
+                    pass # no broken image found, proceed to the next step
 
-        # wait for image to load
-        WebDriverWait(self.driver, 100).until(
-            EC.presence_of_element_located((By.XPATH, '//*[contains(@class,"img1")]//img')))
-        image_url = self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].get_attribute('src')
-        #print(3)
-        #print(image_url)
-        time.sleep(1)
+                # step 3: wait for the unbroken image to load and get the url
+                self.wait_for_element("//div[contains(@class, 'van-field')]//div//img")
+                image_url = self.driver.find_element(By.XPATH,
+                                                     "//div[contains(@class, 'van-field')]//div//img").get_attribute('src')
+                if not image_url:
+                    self.refresh_image()
+                    continue
 
-        # download the image
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
+                # step 4: download the image
+                response = requests.get(image_url, headers=HEADERS, stream=True)
+                if response.status_code != 200:
+                    self.refresh_image()
+                    continue
 
-        response = requests.get(image_url, headers=headers, stream=True)
-        if response.status_code == 200:
-            #print(4)
-            with open("image.jpg", "wb") as file:
-                for chunk in response.iter_content(1024):
-                    file.write(chunk)
-            #print(5)
-            # OCR
-            reader = easyocr.Reader(['en'])
-            result = reader.readtext('image.jpg', allowlist='0123456789')
-            #print(6)
-            if not result: # fail to identify anything
-                self.refresh_image()
-                self.send_verification_code()
-            else:
+                with open("image.jpg", "wb") as file:
+                    for chunk in response.iter_content(1024):
+                        file.write(chunk)
+
+                # step 5: perform OCR
+                result = self.reader.readtext('image.jpg', allowlist='0123456789')
+
+                if not result:
+                    # step 6: no text found
+                    self.refresh_image()
+                    continue
+
+                # step 7: validate and process the text
                 code = result[0][1]
                 if len(code) >= 4:
                     # send the code
                     input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
-                    if self.first_type:
-                        self.first_type = False
-                    else:
-                        input_area.send_keys(Keys.COMMAND + "a")
-                        input_area.send_keys(Keys.DELETE)
-
+                    # if self.first_send:
+                    #     self.first_send = False
+                    # else:
+                    #     input_area.send_keys(Keys.COMMAND + "a")
+                    #     input_area.send_keys(Keys.DELETE)
+                    input_area.clear()
                     input_area.send_keys(code[-4:])
-                else: # fail to identify 4 digits
-                    #print("识别少于4位数")
+                    break
+                else:  # fail to identify 4 digits
+                    # print("识别少于4位数")
                     self.refresh_image()
-                    self.send_verification_code()
-        else: # fail to retrieve the image
-            self.refresh_image()
-            self.send_verification_code()
+                    continue
+            except Exception as e:
+                print(e)
+                self.refresh_image()
 
     def search(self):
         self.search_cnt += 1
@@ -211,3 +197,8 @@ class Hospital:
         self.choose_doctor_page()
         self.choose_time_page()
 
+    def switch_window(self, title):
+        for i, window in enumerate(self.driver.window_handles):
+            self.driver.switch_to.window(window)
+            if self.driver.title == title:
+                break
