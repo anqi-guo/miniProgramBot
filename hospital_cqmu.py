@@ -3,6 +3,7 @@ import os
 import ast
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
+from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -28,6 +29,7 @@ class Hospital:
         # device window size
         self.size = self.driver.get_window_size()
         self.search_cnt = 0
+        self.first_type = True
 
     def to_hospital(self):
         #self.switch()
@@ -46,28 +48,17 @@ class Hospital:
         WebDriverWait(self.driver, 100).until(
             EC.presence_of_element_located((By.XPATH, '//*[contains(@text,"产科门诊")]')))
         # click department
-        swipe_down_cnt = 0
         while True:
             try:
                 self.driver.find_element(By.XPATH, f'//*[@text="{DEPARTMENT}"]').click()
                 break
             except NoSuchElementException:
-                if swipe_down_cnt <= 4:
-                    self.driver.swipe(
-                        self.size['width'] * 0.1,
-                        self.size['height'] * 0.9,
-                        self.size['width'] * 0.1,
-                        self.size['height'] * 0.6
-                    )
-                    swipe_down_cnt += 1
-                else:
-                    self.driver.swipe(
-                        self.size['width'] * 0.1,
-                        self.size['height'] * 0.1,
-                        self.size['width'] * 0.1,
-                        self.size['height'] * 0.9
-                    )
-                    swipe_down_cnt = 0
+                self.driver.swipe(
+                    self.size['width'] * 0.1,
+                    self.size['height'] * 0.9,
+                    self.size['width'] * 0.1,
+                    self.size['height'] * 0.6
+                )
 
         # click subdepartment
         elements = self.driver.find_elements(By.XPATH, f'//*[@text="{SUBDEPARTMENT}"]')
@@ -147,7 +138,7 @@ class Hospital:
                 self.send_verification_code()
                 time.sleep(1)
                 # click confirm
-                self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+                #self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
                 # if it fails to go to the next page then refresh the image
                 self.refresh_image()
             except NoSuchElementException:
@@ -196,9 +187,11 @@ class Hospital:
                 if len(code) >= 4:
                     # send the code
                     input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
-                    input_area.send_keys(Keys.COMMAND + "a")
-                    input_area.send_keys(Keys.DELETE)
+                    if not self.first_type:
+                        input_area.send_keys(Keys.COMMAND + "a")
+                        input_area.send_keys(Keys.DELETE)
                     input_area.send_keys(code[-4:])
+                    self.first_type = False
                 else: # fail to identify 4 digits
                     self.refresh_image()
                     self.send_verification_code()
@@ -213,7 +206,4 @@ class Hospital:
         self.check_availability()
         self.to_confirm()
 
-if __name__ == "__main__":
-    hospital = Hospital()
-    hospital.to_hospital()
-    hospital.search()
+
