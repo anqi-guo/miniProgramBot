@@ -45,45 +45,35 @@ class Hospital:
         self.driver.find_element(By.XPATH, '//*[@text="确定"]').click()
 
     def to_department(self):
-        WebDriverWait(self.driver, 100).until(
-            EC.presence_of_element_located((By.XPATH, '//*[contains(@text,"产科门诊")]')))
-        # click department
-        while True:
-            try:
-                self.driver.find_element(By.XPATH, f'//*[@text="{DEPARTMENT}"]').click()
-                break
-            except NoSuchElementException:
-                self.driver.swipe(
-                    self.size['width'] * 0.1,
-                    self.size['height'] * 0.9,
-                    self.size['width'] * 0.1,
-                    self.size['height'] * 0.6
-                )
+        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
+        self.switch_window("选择科室")
 
-        # click subdepartment
-        elements = self.driver.find_elements(By.XPATH, f'//*[@text="{SUBDEPARTMENT}"]')
-        elements[-1].click()
+        WebDriverWait(self.driver, 100).until(
+            EC.presence_of_element_located((By.XPATH, "//div[@class='leftNav van-sidebar']//a")))
+        # click department
+        a_elements = self.driver.find_elements(By.XPATH, "//div[@class='leftNav van-sidebar']//a")
+        for a in a_elements:
+            text = a.find_element(By.XPATH, ".//div[@class='van-sidebar-item__text']").text
+            if text == DEPARTMENT:
+                a.click()
+                span_elements = self.driver.find_elements(By.XPATH,
+                                                     "//div[@class='van-cell-group van-hairline--top-bottom']//div//div//span")
+                for span in span_elements:
+                    if span.text == SUBDEPARTMENT:
+                        span.click()
+                        return
+        print("error")
 
     def check_availability(self):
-        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
-        self.switch_window("选择医生")
-
-        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//span[@class="labelName" and text()="只看有号"]')))
-
-        # click the doctor
-        while True:
-            try:
-                #self.driver.find_element(By.XPATH, f'//span[text()="{DOCTOR}"]').click()
-                doctor = self.driver.find_element(By.XPATH, f'//span[@class="name" and text()="{DOCTOR}"]')
-                self.driver.execute_script("arguments[0].click();", doctor)
-                break
-            except NoSuchElementException:
-                self.driver.swipe(
-                    self.size['width'] * 0.5,
-                    self.size['height'] * 0.9,
-                    self.size['width'] * 0.5,
-                    self.size['height'] * 0.1
-                )
+        self.switch_window("选择科室")
+        print("选择科室")
+        #WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//span[@class="labelName" and text()="只看有号"]')))
+        time.sleep(5)
+        # Find all <span> elements with class 'name' using XPath
+        span_elements = self.driver.find_elements(By.XPATH, "//div[@class='one']//div//div//span[@class='name']")
+        for span in span_elements:
+            if span.text == DOCTOR:
+                span.click()
 
         self.switch_window("选择时间")
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@role='tablist']")))
