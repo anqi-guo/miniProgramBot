@@ -32,20 +32,25 @@ class Hospital:
         self.first_type = True
 
     def to_hospital(self):
-        #self.switch()
         # click 门诊挂号
-        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[@text="门诊挂号"]')))
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@text="门诊挂号"]')))
         self.driver.find_element(By.XPATH, '//*[@text="门诊挂号"]').click()
-        # click 院区
-        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[@text="本部院区"]')))
-        self.driver.find_element(By.XPATH, f'//*[@text="{HOSPITAL}"]').click()
+        # # click 院区
+        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
+        self.switch_window("预约挂号")
+        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, f'//span[text()="{HOSPITAL}"]')))
+        self.driver.find_element(By.XPATH, f'//span[text()="{HOSPITAL}"]').click()
         # click 确定
-        time.sleep(5)
-        self.driver.find_element(By.XPATH, '//*[contains(@text,"阅读并同意挂号预约须知")]').click()
-        self.driver.find_element(By.XPATH, '//*[@text="确定"]').click()
+        self.switch_window("预约挂号须知")
+
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element(By.XPATH, "//span[text()='(0s)']").get_attribute(
+                "style") == "display: none;"
+        )
+        self.driver.find_element(By.XPATH, "//span[text()='阅读并同意挂号预约须知']").click()
+        self.driver.find_element(By.XPATH, "//button[.//div//span[text()='确定']]").click()
 
     def to_department(self):
-        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         self.switch_window("选择科室")
 
         WebDriverWait(self.driver, 100).until(
@@ -92,7 +97,6 @@ class Hospital:
                 return
 
         # search again
-        # TODO test this part
         self.driver.back()
         self.driver.back()
         self.search()
