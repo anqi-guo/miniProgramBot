@@ -12,6 +12,8 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 import requests
 import easyocr
+from google.cloud import vision_v1
+import io
 
 load_dotenv()
 HOSPITAL = os.getenv("HOSPITAL")
@@ -37,9 +39,9 @@ class Hospital:
         self.driver.find_element(By.XPATH, '//*[@text="门诊挂号"]').click()
 
     def book_page(self):
-        # # click 院区
         self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         self.switch_window("预约挂号")
+        #print("预约挂号")
         WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, f'//span[text()="{HOSPITAL}"]')))
         self.driver.find_element(By.XPATH, f'//span[text()="{HOSPITAL}"]').click()
         # click 确定
@@ -56,7 +58,7 @@ class Hospital:
 
     def choose_department_page(self):
         self.switch_window("选择科室")
-
+        #print("选择科室")
         WebDriverWait(self.driver, 100).until(
             EC.presence_of_element_located((By.XPATH, "//div[@class='leftNav van-sidebar']//a")))
         # click department
@@ -71,21 +73,20 @@ class Hospital:
                     if span.text == SUBDEPARTMENT:
                         span.click()
                         return
-        print("error")
 
     def choose_doctor_page(self):
-        self.switch_window("选择科室")
-        print("选择科室")
-        #WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, '//span[@class="labelName" and text()="只看有号"]')))
-        time.sleep(5)
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='one']//div//div//span[@class='name']")))
+        #print("选择医生")
         # Find all <span> elements with class 'name' using XPath
         span_elements = self.driver.find_elements(By.XPATH, "//div[@class='one']//div//div//span[@class='name']")
         for span in span_elements:
             if span.text == DOCTOR:
                 span.click()
+                break
 
     def choose_time_page(self):
         self.switch_window("选择时间")
+        #print("选择时间")
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@role='tablist']")))
         # Find the parent div with role="tablist"
         tablist = self.driver.find_element(By.XPATH, "//div[@role='tablist']")
@@ -114,23 +115,28 @@ class Hospital:
 
     def booking_info_page(self):
         self.switch_window("预约信息")
-
-        WebDriverWait(self.driver, 100).until(
+        #print("预约信息")
+        WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//span[text()="初诊"]')))
-        # click 初诊
-        self.driver.find_element("xpath", "//span[text()='初诊']").click()
 
+        checked = False
         while True:
             try:
                 # send verification code
                 self.send_verification_code()
-                time.sleep(1)
-                # click confirm
-                #self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+                # click 初诊
+                if not checked:
+                    self.driver.find_element("xpath", "//span[text()='初诊']").click()
+                    checked = True
                 # if it fails to go to the next page then refresh the image
                 self.refresh_image()
-            except NoSuchElementException:
-                break
+            except Exception:
+                print("error")
+                self.driver.back()
+                self.choose_time_page()
+
+        # click confirm
+        # self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
 
     def refresh_image(self):
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
@@ -142,15 +148,20 @@ class Hospital:
                 # wait for image to load
                 time.sleep(1)
                 broken_image = self.driver.find_element(By.XPATH, '//*[contains(@class,"van-image__error")]')
-                print("click broken page")
+                #print("click broken page")
                 broken_image.click()
-            except NoSuchElementException:
+                #print(1)
+            except Exception:
+                #print(2)
                 break
 
         # wait for image to load
+        WebDriverWait(self.driver, 100).until(
+            EC.presence_of_element_located((By.XPATH, '//*[contains(@class,"img1")]//img')))
+        image_url = self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].get_attribute('src')
+        #print(3)
+        #print(image_url)
         time.sleep(1)
-        image = self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1]
-        image_url = image.get_attribute('src')
 
         # download the image
         headers = {
@@ -159,20 +170,20 @@ class Hospital:
 
         response = requests.get(image_url, headers=headers, stream=True)
         if response.status_code == 200:
+            #print(4)
             with open("image.jpg", "wb") as file:
                 for chunk in response.iter_content(1024):
                     file.write(chunk)
+            #print(5)
             # OCR
             reader = easyocr.Reader(['en'])
             result = reader.readtext('image.jpg', allowlist='0123456789')
-
+            #print(6)
             if not result: # fail to identify anything
-                print("no digit")
                 self.refresh_image()
                 self.send_verification_code()
             else:
                 code = result[0][1]
-                print(code)
                 if len(code) >= 4:
                     # send the code
                     input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
@@ -184,7 +195,7 @@ class Hospital:
 
                     input_area.send_keys(code[-4:])
                 else: # fail to identify 4 digits
-                    print("less than 4 digits")
+                    #print("识别少于4位数")
                     self.refresh_image()
                     self.send_verification_code()
         else: # fail to retrieve the image
@@ -193,7 +204,6 @@ class Hospital:
 
     def search(self):
         self.search_cnt += 1
-        print(self.search_cnt, time.ctime())
         self.choose_department_page()
         self.choose_doctor_page()
         self.choose_time_page()
