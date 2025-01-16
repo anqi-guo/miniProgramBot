@@ -128,6 +128,9 @@ class Hospital:
                 if not checked:
                     self.driver.find_element("xpath", "//span[text()='初诊']").click()
                     checked = True
+                # click confirm
+                time.sleep(10)
+                self.driver.find_element(By.XPATH, "//button[div/span[text()='确认预约']]").click()
                 # if it fails to go to the next page then refresh the image
                 self.refresh_image()
             except Exception:
@@ -135,8 +138,7 @@ class Hospital:
                 self.driver.back()
                 self.choose_time_page()
 
-        # click confirm
-        # self.driver.find_element(By.XPATH, '//*[contains(@class,"bt2")]').click()
+
 
     def refresh_image(self):
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
@@ -204,6 +206,7 @@ class Hospital:
 
     def search(self):
         self.search_cnt += 1
+        print(self.search_cnt, time.ctime())
         self.choose_department_page()
         self.choose_doctor_page()
         self.choose_time_page()
