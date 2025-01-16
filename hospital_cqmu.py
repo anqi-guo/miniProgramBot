@@ -90,15 +90,14 @@ class Hospital:
                         return
 
     def choose_doctor_page(self):
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='one']//div//div//span[@class='name']")))
+        self.wait_for_element(xpath="//div[@class='one']//div//div//span[@class='name']")
         #print("选择医生")
-        doctor_elements = self.driver.find_elements(By.XPATH, "//div[@class='one']//span[@class='name']")
+        doctor_elements = self.driver.find_elements(By.XPATH, "//div[@class='one']//div//div//span[@class='name']")
         for span in doctor_elements:
             if span.text == DOCTOR:
                 span.click()
                 return
 
-        print("no doctor")
         self.retry_search(back_attempts=1)
 
     def choose_time_page(self):
@@ -112,13 +111,12 @@ class Hospital:
                 self.booking_info_page()
                 return
 
-        print("no slot")
         self.retry_search(back_attempts=2)
 
     def booking_info_page(self):
         self.switch_window("预约信息")
         #print("预约信息")
-        time.sleep(1)
+        print('\007')
         self.click_element("//span[text()='初诊']")
         while True:
             try:
@@ -178,12 +176,11 @@ class Hospital:
                 if len(code) >= 4:
                     # send the code
                     input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
-                    # if self.first_send:
-                    #     self.first_send = False
-                    # else:
-                    #     input_area.send_keys(Keys.COMMAND + "a")
-                    #     input_area.send_keys(Keys.DELETE)
-                    input_area.clear()
+                    if self.first_send:
+                        self.first_send = False
+                    else:
+                        input_area.send_keys(Keys.COMMAND + "a")
+                        input_area.send_keys(Keys.DELETE)
                     input_area.send_keys(code[-4:])
                     break
                 else:  # fail to identify 4 digits
