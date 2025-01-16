@@ -102,6 +102,7 @@ class Hospital:
                 return
 
         # search again
+        # TODO test this part
         self.driver.back()
         self.driver.back()
         self.search()
@@ -122,6 +123,8 @@ class Hospital:
                 break
 
     def to_confirm(self):
+        self.switch_window("预约信息")
+
         WebDriverWait(self.driver, 100).until(
             EC.presence_of_element_located((By.XPATH, '//span[text()="初诊"]')))
         # click 初诊
