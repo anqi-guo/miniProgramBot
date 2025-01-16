@@ -107,15 +107,6 @@ class Hospital:
         self.driver.back()
         self.search()
 
-    def reserve(self):
-        #playsound()
-        print("有号")
-        # click the first slot
-        WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//*[contains(@text, "余 ")]')))
-        self.driver.find_element(By.XPATH, '//*[contains(@text, "余 ")]').click()
-        # confirm
-        self.to_confirm()
-
     def switch_window(self, title):
         for i, window in enumerate(self.driver.window_handles):
             self.driver.switch_to.window(window)
@@ -141,8 +132,6 @@ class Hospital:
                 self.refresh_image()
             except NoSuchElementException:
                 break
-            finally:
-                print("Done!")
 
     def refresh_image(self):
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
@@ -154,6 +143,7 @@ class Hospital:
                 # wait for image to load
                 time.sleep(1)
                 broken_image = self.driver.find_element(By.XPATH, '//*[contains(@class,"van-image__error")]')
+                print("click broken page")
                 broken_image.click()
             except NoSuchElementException:
                 break
@@ -178,19 +168,24 @@ class Hospital:
             result = reader.readtext('image.jpg', allowlist='0123456789')
 
             if not result: # fail to identify anything
+                print("no digit")
                 self.refresh_image()
                 self.send_verification_code()
             else:
                 code = result[0][1]
+                print(code)
                 if len(code) >= 4:
                     # send the code
                     input_area = self.driver.find_element(By.XPATH, '//*[@placeholder="请输入"]')
-                    if not self.first_type:
+                    if self.first_type:
+                        self.first_type = False
+                    else:
                         input_area.send_keys(Keys.COMMAND + "a")
                         input_area.send_keys(Keys.DELETE)
+
                     input_area.send_keys(code[-4:])
-                    self.first_type = False
                 else: # fail to identify 4 digits
+                    print("less than 4 digits")
                     self.refresh_image()
                     self.send_verification_code()
         else: # fail to retrieve the image
@@ -202,6 +197,4 @@ class Hospital:
         print(self.search_cnt, time.ctime())
         self.to_department()
         self.check_availability()
-        self.to_confirm()
-
 
