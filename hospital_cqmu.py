@@ -236,7 +236,7 @@ class Hospital:
             self.quit()
 
     def restart_program(self):
-        print("restart program")
+        print("restart mini program")
         # switch context to NATIVE_APP
         self.driver.switch_to.context("NATIVE_APP")
         # click on "three dot" button at top right
@@ -264,3 +264,10 @@ class Hospital:
                 self.driver.quit()
         except Exception as e:
             print(f"Error quitting the session: {e}")
+
+if __name__ == "__main__":
+    while True:
+        print("start")
+        hospital = Hospital()
+        hospital.homepage()
+        time.sleep(5)
