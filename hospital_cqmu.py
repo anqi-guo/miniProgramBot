@@ -1,3 +1,4 @@
+from appium.webdriver.common.appiumby import AppiumBy
 from dotenv import load_dotenv
 import os
 import ast
@@ -65,6 +66,8 @@ class Hospital:
         self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         self.switch_window("预约挂号")
 
+        self.restart_program()
+
         self.click_element(f'//span[text()="{HOSPITAL}"]')
         # click 确定
         self.switch_window("预约挂号须知")
@@ -79,17 +82,21 @@ class Hospital:
 
     def choose_department_page(self):
         self.switch_window("选择科室")
-        self.wait_for_element(xpath="//div[@class='leftNav van-sidebar']//a")
+        try:
+            self.wait_for_element(xpath="//div[@class='leftNav van-sidebar']//a")
 
-        department_elements = self.driver.find_elements(By.XPATH, "//div[@class='leftNav van-sidebar']//a")
-        for element in department_elements:
-            if element.find_element(By.XPATH, ".//div[@class='van-sidebar-item__text']").text == DEPARTMENT:
-                element.click()
-                subdepartment_elements = self.driver.find_elements(By.XPATH, "//div[@class='van-cell-group van-hairline--top-bottom']//div//div//span")
-                for span in subdepartment_elements:
-                    if span.text == SUBDEPARTMENT:
-                        span.click()
-                        return
+            department_elements = self.driver.find_elements(By.XPATH, "//div[@class='leftNav van-sidebar']//a")
+            for element in department_elements:
+                if element.find_element(By.XPATH, ".//div[@class='van-sidebar-item__text']").text == DEPARTMENT:
+                    element.click()
+                    subdepartment_elements = self.driver.find_elements(By.XPATH, "//div[@class='van-cell-group van-hairline--top-bottom']//div//div//span")
+                    for span in subdepartment_elements:
+                        if span.text == SUBDEPARTMENT:
+                            span.click()
+                            return
+        except Exception as e:
+            print(e)
+            self.restart_program()
 
     def choose_doctor_page(self):
         try:
@@ -100,7 +107,8 @@ class Hospital:
                     span.click()
                     return
         except NoSuchElementException:
-            self.retry_search(back_attempts=1)
+            print("找不到医生")
+            self.restart_program()
 
     def choose_time_page(self):
         while True:
@@ -115,10 +123,9 @@ class Hospital:
                         return
 
                 self.retry_search(back_attempts=2)
-            except NoSuchElementException:
-                self.quit()
-            except Exception:
-                break
+            except Exception as e:
+                print(e)
+                self.restart_program()
 
     def booking_info_page(self):
         #print("预约信息")
@@ -127,12 +134,12 @@ class Hospital:
         while True:
             try:
                 self.send_verification_code()
-                #time.sleep(10)
+                time.sleep(10)
                 self.click_element("//button[.//span[text()='确认预约']]")
                 self.refresh_image()
-            except Exception:
-                self.driver.back()
-                self.choose_time_page()
+            except Exception as e:
+                print(e)
+                self.retry_search(back_attempts=3)
 
     def refresh_image(self):
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
@@ -195,7 +202,7 @@ class Hospital:
                     continue
             except Exception as e:
                 print(e)
-                self.refresh_image()
+                self.restart_program()
 
     def search(self):
         self.search_cnt += 1
@@ -212,8 +219,19 @@ class Hospital:
         else:
             self.quit()
 
+    def restart_program(self):
+        self.driver.switch_to.context("NATIVE_APP")
+        self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click()
+        time.sleep(1)
+        self.click_element("(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]")
+        self.run()
+
+    def run(self):
+        self.homepage()
+        self.book_page()
+        self.search()
+
     def switch_window(self, title):
-        print("switch to:", title)
         for i, window in enumerate(self.driver.window_handles):
             self.driver.switch_to.window(window)
             if self.driver.title == title:
