@@ -33,15 +33,20 @@ class HospitalMiniProgram:
                     break
                 else:
                     self.retry_search()
+        except RecursionError as e:
+            print(e)
+            self.quit_program()
         except Exception as e:
             print(f"Workflow failed: {e}")
-            self.restart_program()
+            if self.driver:
+                self.restart_program()
 
     def restart_program(self):
         print("Restarting mini program...")
         self.driver.switch_to.context("NATIVE_APP")
         self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click()
         # click on "restart mini program"
+        time.sleep(1)
         self.driver.find_element(By.XPATH, "(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]").click()
         # rerun the searching process
         self.run()
@@ -51,3 +56,17 @@ class HospitalMiniProgram:
         print(self.search_cnt, time.ctime())
         for _ in range(2):
             self.driver.back()
+
+    def quit_program(self):
+        for _ in range(6):
+            self.driver.back()
+        self.driver.switch_to.context("NATIVE_APP")
+        self.driver.back()
+        try:
+            # Add a check if the driver is active or not
+            if self.driver:
+                self.driver.quit()
+                #self.driver = None
+        except Exception as e:
+            print(f"Error quitting the session: {e}")
+            raise

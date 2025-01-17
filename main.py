@@ -15,10 +15,12 @@ CAPS = ast.literal_eval(os.getenv('CAPS'))
 HEADERS = ast.literal_eval(os.getenv("HEADERS"))
 
 if __name__ == "__main__":
-    driver = webdriver.Remote(
-            'http://localhost:4723',
-            options=UiAutomator2Options().load_capabilities(CAPS)
-        )
-    mini_program = HospitalMiniProgram(driver, BRANCH, DEPARTMENT, SUBDEPARTMENT, DOCTOR, HEADERS)
-    mini_program.run()
-    driver.quit()
+    while True:
+        print("start")
+        driver = webdriver.Remote(
+                'http://localhost:4723',
+                options=UiAutomator2Options().load_capabilities(CAPS)
+            )
+        mini_program = HospitalMiniProgram(driver, BRANCH, DEPARTMENT, SUBDEPARTMENT, DOCTOR, HEADERS)
+        mini_program.run()
+        print("end")
