@@ -65,16 +65,12 @@ class Hospital:
     def book_page(self):
         self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         self.switch_window("预约挂号")
-
-        self.restart_program()
-
+        # click on hospital
         self.click_element(f'//span[text()="{HOSPITAL}"]')
-        # click 确定
         self.switch_window("预约挂号须知")
-
+        # wait for checkbox to be clickable and then click
         self.wait_for_element(condition=lambda driver: driver.find_element(By.XPATH, "//span[text()='(0s)']").get_attribute(
                 "style") == "display: none;")
-
         # click checkbox
         self.click_element("//span[text()='阅读并同意挂号预约须知']")
         # click confirm
@@ -220,10 +216,13 @@ class Hospital:
             self.quit()
 
     def restart_program(self):
+        # switch context to NATIVE_APP
         self.driver.switch_to.context("NATIVE_APP")
+        # click on "three dot" button at top right
         self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click()
-        time.sleep(1)
+        # click on "restart mini program"
         self.click_element("(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]")
+        # rerun the searching process
         self.run()
 
     def run(self):
