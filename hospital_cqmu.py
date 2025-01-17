@@ -33,7 +33,7 @@ class Hospital:
         self.first_send = True
         self.reader = easyocr.Reader(["en"])
 
-    def wait_for_element(self, xpath=None, timeout=20, condition=None):
+    def wait_for_element(self, xpath=None, timeout=10, condition=None):
         """Wait for an element to meet the specified condition."""
         try:
             if condition:
@@ -42,7 +42,7 @@ class Hospital:
             else:
                 return WebDriverWait(self.driver, timeout).until(EC.presence_of_element_located((By.XPATH, xpath)))
         except TimeoutException:
-            self.quit()
+            self.restart_program()
 
 
     def click_element(self, xpath):
@@ -61,9 +61,34 @@ class Hospital:
     def homepage(self):
         # click 门诊挂号
         self.click_element('//*[@text="门诊挂号"]')
+        time.sleep(1)
+        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
+        try:
+            self.login_page()
+        except Exception as e:
+            print(e)
+            self.book_page()
+
+    def login_page(self):
+        # log in page
+        for window in self.driver.window_handles:
+            self.driver.switch_to.window(window)
+            if "login" in self.driver.title:
+                break
+        self.click_element("//div[contains(@class, 'wx-checkbox-input')]")
+        self.click_element("//wx-button[contains(@class, 'login-btn')]")
+        time.sleep(1)
+        for window in self.driver.window_handles:
+            self.driver.switch_to.window(window)
+            if "phone-numbers" in self.driver.title:
+                print(self.driver.title)
+                break
+        time.sleep(1)
+        self.click_element("//wx-button[contains(@class, 'phone-tips')]")
+
+        self.book_page()
 
     def book_page(self):
-        self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         self.switch_window("预约挂号")
         # click on hospital
         self.click_element(f'//span[text()="{HOSPITAL}"]')
@@ -76,11 +101,12 @@ class Hospital:
         # click confirm
         self.click_element("//button[.//div//span[text()='确定']]")
 
+        self.choose_department_page()
+
     def choose_department_page(self):
         self.switch_window("选择科室")
         try:
             self.wait_for_element(xpath="//div[@class='leftNav van-sidebar']//a")
-
             department_elements = self.driver.find_elements(By.XPATH, "//div[@class='leftNav van-sidebar']//a")
             for element in department_elements:
                 if element.find_element(By.XPATH, ".//div[@class='van-sidebar-item__text']").text == DEPARTMENT:
@@ -89,6 +115,7 @@ class Hospital:
                     for span in subdepartment_elements:
                         if span.text == SUBDEPARTMENT:
                             span.click()
+                            self.choose_doctor_page()
                             return
         except Exception as e:
             print(e)
@@ -101,6 +128,7 @@ class Hospital:
             for span in doctor_elements:
                 if span.text == DOCTOR:
                     span.click()
+                    self.choose_time_page()
                     return
         except NoSuchElementException:
             print("找不到医生")
@@ -140,6 +168,7 @@ class Hospital:
                 break
 
     def refresh_image(self):
+        # TODO update this
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
 
     def send_verification_code(self):
@@ -202,22 +231,18 @@ class Hospital:
                 print(e)
                 self.restart_program()
 
-    def search(self):
+    def retry_search(self, back_attempts):
         self.search_cnt += 1
         print(self.search_cnt, time.ctime())
-        self.choose_department_page()
-        self.choose_doctor_page()
-        self.choose_time_page()
-
-    def retry_search(self, back_attempts):
-        if self.search_cnt < 300:
+        if self.search_cnt < 100:
             for i in range(back_attempts):
                 self.driver.back()
-            self.search()
+            self.choose_department_page()
         else:
             self.quit()
 
     def restart_program(self):
+        print("restart program")
         # switch context to NATIVE_APP
         self.driver.switch_to.context("NATIVE_APP")
         # click on "three dot" button at top right
@@ -225,12 +250,7 @@ class Hospital:
         # click on "restart mini program"
         self.click_element("(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]")
         # rerun the searching process
-        self.run()
-
-    def run(self):
         self.homepage()
-        self.book_page()
-        self.search()
 
     def switch_window(self, title):
         for i, window in enumerate(self.driver.window_handles):
