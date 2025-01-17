@@ -7,7 +7,7 @@ from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import time
 import requests
 import easyocr
@@ -32,13 +32,16 @@ class Hospital:
         self.first_send = True
         self.reader = easyocr.Reader(["en"])
 
-    def wait_for_element(self, xpath=None, timeout=10, condition=None):
+    def wait_for_element(self, xpath=None, timeout=20, condition=None):
         """Wait for an element to meet the specified condition."""
-        if condition:
-            WebDriverWait(self.driver, timeout).until(condition)
-            return
-        else:
-            return WebDriverWait(self.driver, timeout).until(EC.presence_of_element_located((By.XPATH, xpath)))
+        try:
+            if condition:
+                WebDriverWait(self.driver, timeout).until(condition)
+                return
+            else:
+                return WebDriverWait(self.driver, timeout).until(EC.presence_of_element_located((By.XPATH, xpath)))
+        except TimeoutException:
+            self.quit()
 
 
     def click_element(self, xpath):
@@ -61,7 +64,7 @@ class Hospital:
     def book_page(self):
         self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
         self.switch_window("预约挂号")
-        #print("预约挂号")
+
         self.click_element(f'//span[text()="{HOSPITAL}"]')
         # click 确定
         self.switch_window("预约挂号须知")
@@ -76,7 +79,6 @@ class Hospital:
 
     def choose_department_page(self):
         self.switch_window("选择科室")
-        #print("选择科室")
         self.wait_for_element(xpath="//div[@class='leftNav van-sidebar']//a")
 
         department_elements = self.driver.find_elements(By.XPATH, "//div[@class='leftNav van-sidebar']//a")
@@ -90,38 +92,42 @@ class Hospital:
                         return
 
     def choose_doctor_page(self):
-        self.wait_for_element(xpath="//div[@class='one']//div//div//span[@class='name']")
-        #print("选择医生")
-        doctor_elements = self.driver.find_elements(By.XPATH, "//div[@class='one']//div//div//span[@class='name']")
-        for span in doctor_elements:
-            if span.text == DOCTOR:
-                span.click()
-                return
-
-        self.retry_search(back_attempts=1)
+        try:
+            self.wait_for_element(xpath="//div[@class='one']//div//div//span[@class='name']")
+            doctor_elements = self.driver.find_elements(By.XPATH, "//div[@class='one']//div//div//span[@class='name']")
+            for span in doctor_elements:
+                if span.text == DOCTOR:
+                    span.click()
+                    return
+        except NoSuchElementException:
+            self.retry_search(back_attempts=1)
 
     def choose_time_page(self):
-        self.switch_window("选择时间")
-        #print("选择时间")
-        tablist = self.wait_for_element("//div[@role='tablist']")
-        for tab in tablist.find_elements(By.XPATH, ".//div[@role='tab']"):
-            if "有号" in tab.text:
-                tab.click()
-                self.wait_for_element("//div[contains(@class, 'selectTimeBoxActive')]").click()
-                self.booking_info_page()
-                return
+        while True:
+            try:
+                self.switch_window("选择时间")
+                tablist = self.wait_for_element("//div[@role='tablist']")
+                for tab in tablist.find_elements(By.XPATH, ".//div[@role='tab']"):
+                    if "有号" in tab.text:
+                        tab.click()
+                        self.wait_for_element("//div[contains(@class, 'selectTimeBoxActive')]").click()
+                        self.booking_info_page()
+                        return
 
-        self.retry_search(back_attempts=2)
+                self.retry_search(back_attempts=2)
+            except NoSuchElementException:
+                self.quit()
+            except Exception:
+                break
 
     def booking_info_page(self):
-        self.switch_window("预约信息")
         #print("预约信息")
-        print('\007')
+        time.sleep(1)
         self.click_element("//span[text()='初诊']")
         while True:
             try:
                 self.send_verification_code()
-                time.sleep(10)
+                #time.sleep(10)
                 self.click_element("//button[.//span[text()='确认预约']]")
                 self.refresh_image()
             except Exception:
@@ -199,12 +205,29 @@ class Hospital:
         self.choose_time_page()
 
     def retry_search(self, back_attempts):
-        for i in range(back_attempts):
-            self.driver.back()
-        self.search()
+        if self.search_cnt < 300:
+            for i in range(back_attempts):
+                self.driver.back()
+            self.search()
+        else:
+            self.quit()
 
     def switch_window(self, title):
+        print("switch to:", title)
         for i, window in enumerate(self.driver.window_handles):
             self.driver.switch_to.window(window)
             if self.driver.title == title:
                 break
+
+    def quit(self):
+        for i in range(4):
+            self.driver.back()
+        self.driver.switch_to.context("NATIVE_APP")
+        self.driver.back()
+
+        try:
+            # Add a check if the driver is active or not
+            if self.driver:
+                self.driver.quit()
+        except Exception as e:
+            print(f"Error quitting the session: {e}")
