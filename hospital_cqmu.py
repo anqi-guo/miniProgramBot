@@ -119,6 +119,7 @@ class Hospital:
                         return
 
                 self.retry_search(back_attempts=2)
+                break
             except Exception as e:
                 print(e)
                 self.restart_program()
@@ -136,6 +137,7 @@ class Hospital:
             except Exception as e:
                 print(e)
                 self.retry_search(back_attempts=3)
+                break
 
     def refresh_image(self):
         self.driver.find_elements(By.XPATH, '//*[contains(@class,"img1")]//img')[-1].click()
