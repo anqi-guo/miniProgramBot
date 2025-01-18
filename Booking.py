@@ -30,6 +30,7 @@ class Booking(BaseAutomation):
             self.click_element("//button[.//div//span[text()='确定']]")
         except WebDriverException:
             logging.error("Error selecting branch: web driver issue")
+            raise
         except Exception as e:
             logging.error(f"Error selecting branch: {e}")
             raise
@@ -50,6 +51,7 @@ class Booking(BaseAutomation):
                             return
         except WebDriverException:
             logging.error("Error selecting department: web driver issue")
+            raise
         except Exception as e:
             logging.error(f"Error selecting department: {e}")
             raise
@@ -64,6 +66,7 @@ class Booking(BaseAutomation):
                     return
         except WebDriverException:
             logging.error("Error selecting doctor: web driver issue")
+            raise
         except Exception as e:
             logging.error(f"Error selecting doctor: {e}")
             raise
@@ -82,6 +85,7 @@ class Booking(BaseAutomation):
             return False
         except WebDriverException:
             logging.error("Error selecting time: web driver issue")
+            raise
         except Exception as e:
             logging.error(f"Error selecting time: {e}")
             raise
@@ -95,6 +99,7 @@ class Booking(BaseAutomation):
                 self.verification_handler.refresh_image()
             except WebDriverException:
                 logging.error("Error confirm booking: web driver issue")
+                raise
             except Exception as e:
                 logging.error(f"Error confirming booking: {e}")
                 raise
