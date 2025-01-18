@@ -28,11 +28,8 @@ class Booking(BaseAutomation):
             self.click_element("//span[text()='阅读并同意挂号预约须知']")
             # click confirm
             self.click_element("//button[.//div//span[text()='确定']]")
-        except WebDriverException:
-            logging.error("Error selecting branch: web driver issue")
-            raise
         except Exception as e:
-            logging.error(f"Error selecting branch: {e}")
+            logging.error(f"Error selecting branch")
             raise
 
     def select_department(self, department, subdepartment):
@@ -49,11 +46,8 @@ class Booking(BaseAutomation):
                         if span.text == subdepartment:
                             span.click()
                             return
-        except WebDriverException:
-            logging.error("Error selecting department: web driver issue")
-            raise
         except Exception as e:
-            logging.error(f"Error selecting department: {e}")
+            logging.error(f"Error selecting department")
             raise
 
     def select_doctor(self, doctor):
@@ -64,11 +58,8 @@ class Booking(BaseAutomation):
                 if span.text == doctor:
                     span.click()
                     return
-        except WebDriverException:
-            logging.error("Error selecting doctor: web driver issue")
-            raise
         except Exception as e:
-            logging.error(f"Error selecting doctor: {e}")
+            logging.error(f"Error selecting doctor")
             raise
 
     def select_time(self):
@@ -83,11 +74,8 @@ class Booking(BaseAutomation):
                     self.confirm_booking()
                     return True
             return False
-        except WebDriverException:
-            logging.error("Error selecting time: web driver issue")
-            raise
         except Exception as e:
-            logging.error(f"Error selecting time: {e}")
+            logging.error(f"Error selecting time")
             raise
 
     def confirm_booking(self):
@@ -97,9 +85,6 @@ class Booking(BaseAutomation):
                 self.click_element("//span[text()='初诊']")
                 self.click_element("//button[.//span[text()='确认预约']]")
                 self.verification_handler.refresh_image()
-            except WebDriverException:
-                logging.error("Error confirm booking: web driver issue")
-                raise
             except Exception as e:
-                logging.error(f"Error confirming booking: {e}")
+                logging.error(f"Error confirming booking")
                 raise
