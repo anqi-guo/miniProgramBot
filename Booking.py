@@ -12,7 +12,7 @@ class Booking(BaseAutomation):
     def select_branch(self, branch):
         try:
             self.switch_window("预约挂号")
-            self.click_element(f"//span[text()='{branch}']")
+            self.click_element(f"//div[div/span[text()='{branch}']]")
             self.switch_window("预约挂号须知")
             self.wait_for_element(
                 condition=lambda driver: driver.find_element(By.XPATH, "//span[text()='(0s)']").get_attribute(
