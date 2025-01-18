@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0bfc57bb-33f1-4ef2-a7df-d9f73d62efb9" name="更改" comment="revised here, must switch context first">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/miniProgramBot.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BaseAutomation.py" beforeDir="false" afterPath="$PROJECT_DIR$/BaseAutomation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Booking.py" beforeDir="false" afterPath="$PROJECT_DIR$/Booking.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HospitalMiniProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/HospitalMiniProgram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;anqi-guo&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/anqi-guo/miniProgramBot.git&quot;,
+    &quot;accountId&quot;: &quot;174d3d4d-0dd5-4839-9591-4d3486ba91bb&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2rehqbsYJSdFlBHWMBUlcB47LHE" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Python.HospitalMiniProgram.executor": "Run",
+    "Python.hospital_cqmu.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.temp.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-495700d161d3-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.22562.220" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="0bfc57bb-33f1-4ef2-a7df-d9f73d62efb9" name="更改" comment="" />
+      <created>1736925639838</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1736925639838</updated>
+    </task>
+    <task id="LOCAL-00001" summary="load parameters from .env">
+      <option name="closed" value="true" />
+      <created>1736926194754</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1736926194754</updated>
+    </task>
+    <task id="LOCAL-00002" summary="create Hospital class and initialize parameters">
+      <option name="closed" value="true" />
+      <created>1736926802277</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1736926802277</updated>
+    </task>
+    <task id="LOCAL-00003" summary="write set up instruction">
+      <option name="closed" value="true" />
+      <created>1736927933695</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1736927933695</updated>
+    </task>
+    <task id="LOCAL-00004" summary="test connection">
+      <option name="closed" value="true" />
+      <created>1736928051204</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1736928051204</updated>
+    </task>
+    <task id="LOCAL-00005" summary="enter program">
+      <option name="closed" value="true" />
+      <created>1736928354811</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1736928354811</updated>
+    </task>
+    <task id="LOCAL-00006" summary="removed enter_program method">
+      <option name="closed" value="true" />
+      <created>1736929253561</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1736929253561</updated>
+    </task>
+    <task id="LOCAL-00007" summary="from homepage to department page">
+      <option name="closed" value="true" />
+      <created>1736929497220</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1736929497220</updated>
+    </task>
+    <task id="LOCAL-00008" summary="swipe and click department and subdepartment">
+      <option name="closed" value="true" />
+      <created>1736930284004</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1736930284004</updated>
+    </task>
+    <task id="LOCAL-00009" summary="click the doctor and find their earliest available date">
+      <option name="closed" value="true" />
+      <created>1736931305542</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1736931305542</updated>
+    </task>
+    <task id="LOCAL-00010" summary="to final reservation page">
+      <option name="closed" value="true" />
+      <created>1736931763798</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1736931763798</updated>
+    </task>
+    <task id="LOCAL-00011" summary="identify the numbers in verification image">
+      <option name="closed" value="true" />
+      <created>1736933684312</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1736933684312</updated>
+    </task>
+    <task id="LOCAL-00012" summary="fixed errors on identifying the 4 digits on the image">
+      <option name="closed" value="true" />
+      <created>1736938698985</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1736938698985</updated>
+    </task>
+    <task id="LOCAL-00013" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1736938717104</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1736938717104</updated>
+    </task>
+    <task id="LOCAL-00014" summary="add search_again() method and run() method">
+      <option name="closed" value="true" />
+      <created>1736939028440</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1736939028440</updated>
+    </task>
+    <task id="LOCAL-00015" summary="integrate search_again into search() method">
+      <option name="closed" value="true" />
+      <created>1736939348193</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1736939348193</updated>
+    </task>
+    <task id="LOCAL-00016" summary="fixed errors on sending verification code">
+      <option name="closed" value="true" />
+      <created>1736947395271</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1736947395271</updated>
+    </task>
+    <task id="LOCAL-00017" summary="uncomment some lines">
+      <option name="closed" value="true" />
+      <created>1736948610137</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1736948610137</updated>
+    </task>
+    <task id="LOCAL-00018" summary="removed blank lines">
+      <option name="closed" value="true" />
+      <created>1736948622573</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1736948622573</updated>
+    </task>
+    <task id="LOCAL-00019" summary="uncommented code">
+      <option name="closed" value="true" />
+      <created>1736948720676</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1736948720676</updated>
+    </task>
+    <task id="LOCAL-00020" summary="updated instruction on emulator">
+      <option name="closed" value="true" />
+      <created>1736951045596</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1736951045596</updated>
+    </task>
+    <task id="LOCAL-00021" summary="comment on final submit button at testing stage">
+      <option name="closed" value="true" />
+      <created>1736951088362</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1736951088362</updated>
+    </task>
+    <task id="LOCAL-00022" summary="removed clicking on &quot;only display available&quot;">
+      <option name="closed" value="true" />
+      <created>1736952934884</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1736952934884</updated>
+    </task>
+    <task id="LOCAL-00023" summary="adjusted swiping range">
+      <option name="closed" value="true" />
+      <created>1736995630178</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1736995630178</updated>
+    </task>
+    <task id="LOCAL-00024" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1737010625948</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1737010625948</updated>
+    </task>
+    <task id="LOCAL-00025" summary="fixed error on mistakenly adding letter a to verification code when trying to delete empty string">
+      <option name="closed" value="true" />
+      <created>1737014167282</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1737014167282</updated>
+    </task>
+    <task id="LOCAL-00026" summary="switch context to webview before clicking on 初诊">
+      <option name="closed" value="true" />
+      <created>1737015689813</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1737015689813</updated>
+    </task>
+    <task id="LOCAL-00027" summary="switch context to webview before &quot;choose doctor&quot;">
+      <option name="closed" value="true" />
+      <created>1737019419585</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1737019419585</updated>
+    </task>
+    <task id="LOCAL-00028" summary="switch window at confirmation page">
+      <option name="closed" value="true" />
+      <created>1737019540224</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1737019540224</updated>
+    </task>
+    <task id="LOCAL-00029" summary="fixed error on deleting empty input">
+      <option name="closed" value="true" />
+      <created>1737021981520</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1737021981520</updated>
+    </task>
+    <task id="LOCAL-00030" summary="switch window in &quot;choose department page&quot;">
+      <option name="closed" value="true" />
+      <created>1737026136173</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1737026136173</updated>
+    </task>
+    <task id="LOCAL-00031" summary="switch window in the second page">
+      <option name="closed" value="true" />
+      <created>1737028809090</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1737028809090</updated>
+    </task>
+    <task id="LOCAL-00032" summary="add comments">
+      <option name="closed" value="true" />
+      <created>1737028856535</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1737028856535</updated>
+    </task>
+    <task id="LOCAL-00033" summary="restructured and renamed methods">
+      <option name="closed" value="true" />
+      <created>1737029358144</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1737029358144</updated>
+    </task>
+    <task id="LOCAL-00034" summary="fixed error caused by poor internet connection">
+      <option name="closed" value="true" />
+      <created>1737036678338</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1737036678338</updated>
+    </task>
+    <task id="LOCAL-00035" summary="all tested">
+      <option name="closed" value="true" />
+      <created>1737037291607</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1737037291607</updated>
+    </task>
+    <task id="LOCAL-00036" summary="optimized code">
+      <option name="closed" value="true" />
+      <created>1737041759046</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1737041759046</updated>
+    </task>
+    <task id="LOCAL-00037" summary="fixed error on retry search">
+      <option name="closed" value="true" />
+      <created>1737042717203</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1737042717203</updated>
+    </task>
+    <task id="LOCAL-00038" summary="fixed error on deleting verification code">
+      <option name="closed" value="true" />
+      <created>1737044389979</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1737044389979</updated>
+    </task>
+    <task id="LOCAL-00039" summary="fixed bug on reaching maximum recursion">
+      <option name="closed" value="true" />
+      <created>1737081726714</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1737081726714</updated>
+    </task>
+    <task id="LOCAL-00040" summary="restart the mini program when no department or doctor is loaded">
+      <option name="closed" value="true" />
+      <created>1737086625631</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1737086625631</updated>
+    </task>
+    <task id="LOCAL-00041" summary="commented on restart_program method">
+      <option name="closed" value="true" />
+      <created>1737087321997</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1737087321997</updated>
+    </task>
+    <task id="LOCAL-00042" summary="fixed error on not stopping the loop after quiting">
+      <option name="closed" value="true" />
+      <created>1737089372618</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1737089372618</updated>
+    </task>
+    <task id="LOCAL-00043" summary="added log_page() method and restructured the class">
+      <option name="closed" value="true" />
+      <created>1737096758380</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1737096758380</updated>
+    </task>
+    <task id="LOCAL-00044" summary="moved util methods down and updated refresh_image() method">
+      <option name="closed" value="true" />
+      <created>1737097565962</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1737097565962</updated>
+    </task>
+    <task id="LOCAL-00045" summary="modularized the class into several classes">
+      <option name="closed" value="true" />
+      <created>1737119308869</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1737119308869</updated>
+    </task>
+    <task id="LOCAL-00046" summary="optimized the logic regarding recursion error">
+      <option name="closed" value="true" />
+      <created>1737121121154</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1737121121154</updated>
+    </task>
+    <task id="LOCAL-00047" summary="original scripts">
+      <option name="closed" value="true" />
+      <created>1737121161152</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1737121161152</updated>
+    </task>
+    <task id="LOCAL-00048" summary="check if a window pops up, and switch context on this page">
+      <option name="closed" value="true" />
+      <created>1737181288288</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1737181288288</updated>
+    </task>
+    <task id="LOCAL-00049" summary="revised here, must switch context first">
+      <option name="closed" value="true" />
+      <created>1737181492459</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1737181492459</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
+    <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fixed error on mistakenly adding letter a to verification code when trying to delete empty string" />
+    <MESSAGE value="switch context to webview before clicking on 初诊" />
+    <MESSAGE value="switch context to webview before &quot;choose doctor&quot;" />
+    <MESSAGE value="switch window at confirmation page" />
+    <MESSAGE value="fixed error on deleting empty input" />
+    <MESSAGE value="switch window in &quot;choose department page&quot;" />
+    <MESSAGE value="switch window in the second page" />
+    <MESSAGE value="add comments" />
+    <MESSAGE value="restructured and renamed methods" />
+    <MESSAGE value="fixed error caused by poor internet connection" />
+    <MESSAGE value="all tested" />
+    <MESSAGE value="optimized code" />
+    <MESSAGE value="fixed error on retry search" />
+    <MESSAGE value="fixed error on deleting verification code" />
+    <MESSAGE value="fixed bug on reaching maximum recursion" />
+    <MESSAGE value="restart the mini program when no department or doctor is loaded" />
+    <MESSAGE value="commented on restart_program method" />
+    <MESSAGE value="fixed error on not stopping the loop after quiting" />
+    <MESSAGE value="added log_page() method and restructured the class" />
+    <MESSAGE value="moved util methods down and updated refresh_image() method" />
+    <MESSAGE value="modularized the class into several classes" />
+    <MESSAGE value="optimized the logic regarding recursion error" />
+    <MESSAGE value="original scripts" />
+    <MESSAGE value="check if a window pops up, and switch context on this page" />
+    <MESSAGE value="revised here, must switch context first" />
+    <option name="LAST_COMMIT_MESSAGE" value="revised here, must switch context first" />
+  </component>
+</project>
