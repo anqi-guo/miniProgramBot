@@ -1,11 +1,15 @@
 import time
-
+from selenium.common import NoSuchElementException, TimeoutException, WebDriverException
 from Booking import Booking
 from Hompage import Homepage
 from LoginPage import LoginPage
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.common.by import By
+import logging
+from log import setup_logging
 
+# initialize logging
+setup_logging()
 
 class HospitalMiniProgram:
     def __init__(self, driver, branch, department, subdepartment, doctor, headers):
@@ -37,15 +41,21 @@ class HospitalMiniProgram:
                 else:
                     self.retry_search()
         except RecursionError as e:
-            print(e)
+            logging.error("Reached recursion limit")
             self.quit_program()
+        except NoSuchElementException as e:
+            logging.error(f"Element not found")
+        except TimeoutException as e:
+            logging.error(f"Operation time out")
+        except WebDriverException:
+            logging.error("Web driver issue")
         except Exception as e:
-            print(f"Workflow failed: {e}")
+            logging.error(f"Workflow failed: {e}")
             if self.driver:
                 self.restart_program()
 
     def restart_program(self):
-        print("Restarting mini program...")
+        logging.info("Restarting mini program...")
         self.driver.switch_to.context("NATIVE_APP")
         self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click()
         # click on "restart mini program"
@@ -56,7 +66,7 @@ class HospitalMiniProgram:
 
     def retry_search(self):
         self.search_cnt += 1
-        print(self.search_cnt, time.ctime())
+        logging.info(f"Search attempt {self.search_cnt}")
         for _ in range(2):
             self.driver.back()
 
@@ -71,5 +81,5 @@ class HospitalMiniProgram:
                 self.driver.quit()
                 #self.driver = None
         except Exception as e:
-            print(f"Error quitting the session: {e}")
+            logging.error(f"Error quitting the session: {e}")
             raise

@@ -29,5 +29,4 @@ class Homepage(BaseAutomation):
                 self.switch_window("index")
             self.click_element("//wx-view[@class='title' and text()='门诊挂号']")
         except Exception as e:
-            print(f"Error on homepage: {e}")
             raise

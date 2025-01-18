@@ -3,6 +3,11 @@ import time
 from BaseAutomation import BaseAutomation
 from selenium.webdriver.common.by import By
 from verification_handler import VerificationHandler
+from log import setup_logging
+import logging
+
+# initialize logging
+setup_logging()
 
 class Booking(BaseAutomation):
     def __init__(self, driver, headers):
@@ -22,7 +27,7 @@ class Booking(BaseAutomation):
             # click confirm
             self.click_element("//button[.//div//span[text()='确定']]")
         except Exception as e:
-            print(f"Error selecting branch: {e}")
+            logging.error(f"Error selecting branch: {e}")
             raise
 
     def select_department(self, department, subdepartment):
@@ -40,7 +45,7 @@ class Booking(BaseAutomation):
                             span.click()
                             return
         except Exception as e:
-            print(f"Error selecting department: {e}")
+            logging.error(f"Error selecting department: {e}")
             raise
 
     def select_doctor(self, doctor):
@@ -52,7 +57,7 @@ class Booking(BaseAutomation):
                     span.click()
                     return
         except Exception as e:
-            print(f"Error selecting doctor: {e}")
+            logging.error(f"Error selecting doctor: {e}")
             raise
 
     def select_time(self):
@@ -68,7 +73,7 @@ class Booking(BaseAutomation):
                     return True
             return False
         except Exception as e:
-            print(f"Error selecting time: {e}")
+            logging.error(f"Error selecting time: {e}")
             raise
 
     def confirm_booking(self):
@@ -79,5 +84,5 @@ class Booking(BaseAutomation):
                 self.click_element("//button[.//span[text()='确认预约']]")
                 self.verification_handler.refresh_image()
             except Exception as e:
-                print(f"Error confirming booking: {e}")
+                logging.error(f"Error confirming booking: {e}")
                 raise
