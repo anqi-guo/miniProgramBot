@@ -14,7 +14,7 @@ def setup_logging(log_file="hospital_mini_program.log"):
             level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
             format="%(asctime)s - %(levelname)s - %(message)s",
             filename=log_file,  # Logs to the specified file
-            filemode="a"  # Append mode; use "w" to overwrite the log file each time
+            filemode="w" # write, "a" append
         )
 
         # Add a console handler to also log messages to the console
