@@ -1,5 +1,7 @@
 import time
 from selenium.common import NoSuchElementException, TimeoutException, WebDriverException
+
+from BaseAutomation import BaseAutomation
 from Booking import Booking
 from Hompage import Homepage
 from LoginPage import LoginPage
@@ -11,7 +13,7 @@ from log import setup_logging
 # initialize logging
 setup_logging()
 
-class HospitalMiniProgram:
+class HospitalMiniProgram(BaseAutomation):
     def __init__(self, driver, branch, department, subdepartment, doctor, headers):
         self.driver = driver
         self.headers = headers
@@ -23,6 +25,7 @@ class HospitalMiniProgram:
         self.login_page = LoginPage(driver)
         self.booking = Booking(driver, headers)
         self.search_cnt = 0
+        self.restart_cnt = 0
 
     def run(self):
         try:
@@ -30,6 +33,7 @@ class HospitalMiniProgram:
                 self.homepage.open_mini_program()
 
             self.homepage.outpatient_registration()
+            self.restart_cnt = 0
             if self.login_page.is_login_required():
                 self.login_page.login()
             self.booking.select_branch(self.branch)
@@ -51,17 +55,56 @@ class HospitalMiniProgram:
             logging.error("Web driver issue")
         except Exception as e:
             logging.error(f"Workflow failed: {e}")
-            if self.driver:
+            if self.restart_cnt < 4:
                 self.restart_program()
+            else:
+                self.clear_cache()
 
     def restart_program(self):
         logging.info("Restarting mini program...")
+        self.restart_cnt += 1
         self.driver.switch_to.context("NATIVE_APP")
         self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click()
         # click on "restart mini program"
         time.sleep(1)
-        self.driver.find_element(By.XPATH, "(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]").click()
+        self.click_element("(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]")
+        #self.driver.find_element(By.XPATH, "(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]").click()
         # rerun the searching process
+        self.run()
+
+    def clear_cache(self):
+        self.driver.switch_to.context("NATIVE_APP")
+        # close mini program
+        self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click() # TODO change to close button
+        # click 我
+        self.click_element('//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="我"]')
+        #self.driver.find_element(By.XPATH, '//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="我"]').click()
+        # click 设置
+        self.click_element('//*[@text="设置"]')
+        #self.driver.find_element(By.XPATH, '//*[@text="设置"]').click()
+        # click 通用
+        self.click_element('(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[7]')
+        #self.driver.find_element(By.XPATH, '(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[7]').click()
+        # click 存储空间
+        self.click_element('(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[21]')
+        #self.driver.find_element(By.XPATH, '(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[21]').click()
+        # click 去清理
+        self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/pjh"]')
+        #self.driver.find_element(By.XPATH, '//android.widget.Button[@resource-id="com.tencent.mm:id/pjh"]').click()
+        # click 清理
+        self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/crz"]')
+        #self.driver.find_element(By.XPATH, '//android.widget.Button[@resource-id="com.tencent.mm:id/crz"]').click()
+        # click 清理 in pop up window
+        self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/mm_alert_ok_btn"]')
+        #self.driver.find_element(By.XPATH, '//android.widget.Button[@resource-id="com.tencent.mm:id/mm_alert_ok_btn"]').click()
+        # click 返回
+        for _ in range(4):
+            self.click_element('//android.widget.ImageView[@content-desc="返回"]')
+        #self.driver.find_element(By.XPATH, '//android.widget.ImageView[@content-desc="返回"]').click()
+        # click 微信
+        self.click_element('//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="微信"]')
+        #self.driver.find_element(By.XPATH, '//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="微信"]').click()
+        # run
         self.run()
 
     def retry_search(self):
