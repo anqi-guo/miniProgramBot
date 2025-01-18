@@ -55,7 +55,7 @@ class HospitalMiniProgram(BaseAutomation):
                     break # if there are available slot, then quit the while loop
                 else:
                     self.retry_search() # go back to the select department page and retry search
-        except (RecursionError, NoSuchElementException, TimeoutException, WebDriverException) as e:
+        except (RecursionError, KeyError, NoSuchElementException, TimeoutException, WebDriverException) as e:
             self.handle_error(e)
         except Exception as e:
             logging.error(f"Workflow failed with unexpected error: {e}")
@@ -66,9 +66,13 @@ class HospitalMiniProgram(BaseAutomation):
             RecursionError: 'Reached recursion limit',
             NoSuchElementException: 'Element not found',
             TimeoutException: 'Operation time out',
-            WebDriverException: 'Web driver issue'
+            WebDriverException: 'Web driver issue',
+            KeyError: 'Key not found'
         }
-        logging.error(errors[e])
+
+        error_message = errors.get(type(e), 'Unknown error occurred')
+        logging.error(f'Error: {error_message}')
+
         if self.restart_cnt < 4:
             self.restart_cnt += 1
             self.restart_program()
