@@ -22,6 +22,10 @@ class HospitalMiniProgram:
 
     def run(self):
         try:
+            if not self.homepage.is_open():
+                print("no open")
+                self.homepage.open_mini_program()
+
             self.homepage.outpatient_registration()
             if self.login_page.is_login_required():
                 self.login_page.login()
