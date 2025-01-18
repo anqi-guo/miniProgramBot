@@ -1,5 +1,7 @@
 import time
 
+from selenium.common import WebDriverException
+
 from BaseAutomation import BaseAutomation
 from selenium.webdriver.common.by import By
 from verification_handler import VerificationHandler
@@ -26,6 +28,8 @@ class Booking(BaseAutomation):
             self.click_element("//span[text()='阅读并同意挂号预约须知']")
             # click confirm
             self.click_element("//button[.//div//span[text()='确定']]")
+        except WebDriverException:
+            logging.error("Error selecting branch: web driver issue")
         except Exception as e:
             logging.error(f"Error selecting branch: {e}")
             raise
@@ -44,6 +48,8 @@ class Booking(BaseAutomation):
                         if span.text == subdepartment:
                             span.click()
                             return
+        except WebDriverException:
+            logging.error("Error selecting department: web driver issue")
         except Exception as e:
             logging.error(f"Error selecting department: {e}")
             raise
@@ -56,6 +62,8 @@ class Booking(BaseAutomation):
                 if span.text == doctor:
                     span.click()
                     return
+        except WebDriverException:
+            logging.error("Error selecting doctor: web driver issue")
         except Exception as e:
             logging.error(f"Error selecting doctor: {e}")
             raise
@@ -72,6 +80,8 @@ class Booking(BaseAutomation):
                     self.confirm_booking()
                     return True
             return False
+        except WebDriverException:
+            logging.error("Error selecting time: web driver issue")
         except Exception as e:
             logging.error(f"Error selecting time: {e}")
             raise
@@ -83,6 +93,8 @@ class Booking(BaseAutomation):
                 self.click_element("//span[text()='初诊']")
                 self.click_element("//button[.//span[text()='确认预约']]")
                 self.verification_handler.refresh_image()
+            except WebDriverException:
+                logging.error("Error confirm booking: web driver issue")
             except Exception as e:
                 logging.error(f"Error confirming booking: {e}")
                 raise
