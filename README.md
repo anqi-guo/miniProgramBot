@@ -27,7 +27,7 @@ This project automates the process of searching for available slots and register
 1. Clone this repository:
    ```bash
    git clone https://github.com/anqi-guo/miniProgramBot
-   cd hospital-slot-search
+   cd miniProgramBot
    ```
 
 2. Install the required dependencies:
