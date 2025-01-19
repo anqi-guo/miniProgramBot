@@ -1,7 +1,7 @@
 from BaseAutomation import BaseAutomation
 import time
 from selenium.webdriver.common.by import By
-
+import logging
 
 class Homepage(BaseAutomation):
     def __init__(self, driver):
@@ -27,6 +27,7 @@ class Homepage(BaseAutomation):
             if not self.switch_window("index"):
                 self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand2')
                 self.switch_window("index")
+            logging.info("hompage: switched context and window")
             self.click_element("//wx-view[@class='title' and text()='门诊挂号']")
         except Exception as e:
             raise
