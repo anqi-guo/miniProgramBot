@@ -1,15 +1,8 @@
-import time
-
-from selenium.common import WebDriverException
-
 from BaseAutomation import BaseAutomation
 from selenium.webdriver.common.by import By
 from verification_handler import VerificationHandler
-from log import setup_logging
 import logging
 
-# initialize logging
-setup_logging()
 
 class Booking(BaseAutomation):
     def __init__(self, driver, headers):

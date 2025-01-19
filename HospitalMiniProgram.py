@@ -1,5 +1,5 @@
 import time
-from selenium.common import NoSuchElementException, TimeoutException, WebDriverException
+from selenium.common import NoSuchElementException, TimeoutException, WebDriverException, StaleElementReferenceException
 
 from BaseAutomation import BaseAutomation
 from Booking import Booking
@@ -15,6 +15,7 @@ setup_logging()
 
 class HospitalMiniProgram(BaseAutomation):
     def __init__(self, driver, branch, department, subdepartment, doctor, headers):
+        super().__init__(driver)
         self.driver = driver
         self.headers = headers
         self.branch = branch
@@ -25,7 +26,6 @@ class HospitalMiniProgram(BaseAutomation):
         self.login_page = LoginPage(driver)
         self.booking = Booking(driver, headers)
         self.search_cnt = 0
-        self.restart_cnt = 0
 
     def run(self):
         try:
@@ -55,7 +55,7 @@ class HospitalMiniProgram(BaseAutomation):
                     break # if there are available slot, then quit the while loop
                 else:
                     self.retry_search() # go back to the select department page and retry search
-        except (RecursionError, KeyError, NoSuchElementException, TimeoutException, WebDriverException) as e:
+        except (RecursionError, KeyError, NoSuchElementException, TimeoutException, WebDriverException, StaleElementReferenceException) as e:
             self.handle_error(e)
         except Exception as e:
             logging.error(f"Workflow failed with unexpected error: {e}")
@@ -63,68 +63,70 @@ class HospitalMiniProgram(BaseAutomation):
 
     def handle_error(self, e):
         errors = {
-            RecursionError: 'Reached recursion limit',
             NoSuchElementException: 'Element not found',
             TimeoutException: 'Operation time out',
             WebDriverException: 'Web driver issue',
-            KeyError: 'Key not found'
+            StaleElementReferenceException: 'Stale element not found in the current frame',
+            KeyError: 'Key not found',
+            RecursionError: 'Reached recursion limit',
         }
 
         error_message = errors.get(type(e), 'Unknown error occurred')
         logging.error(f'Error: {error_message}')
 
-        if self.restart_cnt < 4:
-            self.restart_cnt += 1
-            self.restart_program()
-        else:
-            self.clear_cache()
+        self.restart_program()
 
     def restart_program(self):
-        logging.info("Restarting mini program...")
-        self.restart_cnt += 1
-        self.driver.switch_to.context("NATIVE_APP")
-        self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click()
-        # click on "restart mini program"
-        time.sleep(1)
-        self.click_element("(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]")
-        #self.driver.find_element(By.XPATH, "(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]").click()
-        # rerun the searching process
-        self.run()
+        try:
+            logging.info("Restarting mini program...")
+            time.sleep(1)
+            self.restart_cnt += 1
+            self.driver.switch_to.context("NATIVE_APP")
+            self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click()
+            # click on "restart mini program"
+            time.sleep(1)
+            self.click_element("(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]")
+            #self.driver.find_element(By.XPATH, "(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]").click()
+            # rerun the searching process
+            self.run()
+        except Exception:
+            logging.error("Error on restarting program")
+            self.clear_cache()
 
     def clear_cache(self):
-        self.driver.switch_to.context("NATIVE_APP")
-        # close mini program
-        self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click() # TODO change to close button
-        # click 我
-        self.click_element('//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="我"]')
-        #self.driver.find_element(By.XPATH, '//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="我"]').click()
-        # click 设置
-        self.click_element('//*[@text="设置"]')
-        #self.driver.find_element(By.XPATH, '//*[@text="设置"]').click()
-        # click 通用
-        self.click_element('(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[7]')
-        #self.driver.find_element(By.XPATH, '(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[7]').click()
-        # click 存储空间
-        self.click_element('(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[21]')
-        #self.driver.find_element(By.XPATH, '(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[21]').click()
-        # click 去清理
-        self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/pjh"]')
-        #self.driver.find_element(By.XPATH, '//android.widget.Button[@resource-id="com.tencent.mm:id/pjh"]').click()
-        # click 清理
-        self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/crz"]')
-        #self.driver.find_element(By.XPATH, '//android.widget.Button[@resource-id="com.tencent.mm:id/crz"]').click()
-        # click 清理 in pop up window
-        self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/mm_alert_ok_btn"]')
-        #self.driver.find_element(By.XPATH, '//android.widget.Button[@resource-id="com.tencent.mm:id/mm_alert_ok_btn"]').click()
-        # click 返回
-        for _ in range(4):
-            self.click_element('//android.widget.ImageView[@content-desc="返回"]')
-        #self.driver.find_element(By.XPATH, '//android.widget.ImageView[@content-desc="返回"]').click()
-        # click 微信
-        self.click_element('//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="微信"]')
-        #self.driver.find_element(By.XPATH, '//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="微信"]').click()
-        # run
-        self.run()
+        try:
+            logging.info("clear cache: start")
+            try:
+                # close mini program
+                self.driver.switch_to.context("NATIVE_APP")
+                logging.info("clear cache: switched context to NATIVE_APP")
+                self.click_element('(//android.widget.ImageButton[@content-desc="Close"])[2]')
+            except NoSuchElementException:
+                logging.info("clear cache: not in mini program")
+
+            # click 我
+            self.click_element('//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="我"]')
+            # click 设置
+            self.click_element('//*[@text="设置"]')
+            # click 通用
+            self.click_element('(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[7]')
+            # click 存储空间
+            self.click_element('(//android.widget.LinearLayout[@resource-id="com.tencent.mm:id/oct"])[21]')
+            # click 去清理
+            self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/pjh"]')
+            # click 清理
+            self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/crz"]')
+            # click 清理 in pop up window
+            self.click_element('//android.widget.Button[@resource-id="com.tencent.mm:id/mm_alert_ok_btn"]')
+            # click 返回
+            for _ in range(4):
+                self.click_element('//android.widget.ImageView[@content-desc="返回"]')
+            # click 微信
+            self.click_element('//android.widget.TextView[@resource-id="com.tencent.mm:id/icon_tv" and @text="微信"]')
+            # run
+            self.run()
+        except Exception:
+            logging.error("Error on clearing cache")
 
     def retry_search(self):
         self.search_cnt += 1
