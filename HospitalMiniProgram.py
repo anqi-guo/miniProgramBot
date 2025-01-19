@@ -29,6 +29,7 @@ class HospitalMiniProgram(BaseAutomation):
 
     def run(self):
         try:
+            logging.info("Running")
             # ensure the mini program is open
             if not self.homepage.is_open():
                 self.homepage.open_mini_program()
@@ -62,17 +63,18 @@ class HospitalMiniProgram(BaseAutomation):
             self.handle_error(e)
 
     def handle_error(self, e):
-        errors = {
-            NoSuchElementException: 'Element not found',
-            TimeoutException: 'Operation time out',
-            WebDriverException: 'Web driver issue',
-            StaleElementReferenceException: 'Stale element not found in the current frame',
-            KeyError: 'Key not found',
-            RecursionError: 'Reached recursion limit',
-        }
+        try:
+            errors = {
+                NoSuchElementException: 'Element not found',
+                TimeoutException: 'Operation time out',
+                WebDriverException: 'Web driver issue',
+                StaleElementReferenceException: 'Stale element not found in the current frame',
+                KeyError: 'Key not found',
+                RecursionError: 'Reached recursion limit',
+            }
 
-        error_message = errors.get(type(e), 'Unknown error occurred')
-        logging.error(f'Error: {error_message}')
+            error_message = errors.get(type(e), 'Unknown error occurred')
+            logging.error(error_message)
 
             if type(e) == WebDriverException or type(e) == Exception:
                 self.clear_cache()
@@ -87,7 +89,9 @@ class HospitalMiniProgram(BaseAutomation):
             time.sleep(1)
             self.restart_cnt += 1
             self.driver.switch_to.context("NATIVE_APP")
+            logging.info("restarting: switched context to NATIVE_APP")
             self.driver.find_element(AppiumBy.ACCESSIBILITY_ID, "More").click()
+            logging.info("restarting: clicked three dots")
             # click on "restart mini program"
             time.sleep(1)
             self.click_element("(//android.widget.ImageView[@resource-id='com.tencent.mm:id/h5n'])[10]")
@@ -101,9 +105,9 @@ class HospitalMiniProgram(BaseAutomation):
     def clear_cache(self):
         try:
             logging.info("clear cache: start")
+            self.driver.switch_to.context("NATIVE_APP")
             try:
                 # close mini program
-                self.driver.switch_to.context("NATIVE_APP")
                 logging.info("clear cache: switched context to NATIVE_APP")
                 self.click_element('(//android.widget.ImageButton[@content-desc="Close"])[2]')
             except NoSuchElementException:
