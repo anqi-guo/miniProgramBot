@@ -21,7 +21,7 @@ if __name__ == "__main__":
                 'http://localhost:4723',
                 options=UiAutomator2Options().load_capabilities(CAPS)
             )
-        logging.info("Driver created")
+        logging.critical("Driver created")
         mini_program = HospitalMiniProgram(driver, BRANCH, DEPARTMENT, SUBDEPARTMENT, DOCTOR, HEADERS)
         mini_program.run()
-        logging.info("Driver ended")
+        logging.critical("Driver ended")

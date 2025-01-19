@@ -85,7 +85,7 @@ class HospitalMiniProgram(BaseAutomation):
 
     def restart_program(self):
         try:
-            logging.info("Restarting mini program...")
+            logging.critical("Restarting mini program...")
             time.sleep(1)
             self.restart_cnt += 1
             self.driver.switch_to.context("NATIVE_APP")
@@ -104,7 +104,7 @@ class HospitalMiniProgram(BaseAutomation):
 
     def clear_cache(self):
         try:
-            logging.info("clear cache: start")
+            logging.critical("clear cache: start")
             self.driver.switch_to.context("NATIVE_APP")
             try:
                 # close mini program
