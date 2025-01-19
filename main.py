@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import ast
 from HospitalMiniProgram import HospitalMiniProgram
+import logging
 
 load_dotenv()
 
@@ -16,11 +17,11 @@ HEADERS = ast.literal_eval(os.getenv("HEADERS"))
 
 if __name__ == "__main__":
     while True:
-        print("start")
         driver = webdriver.Remote(
                 'http://localhost:4723',
                 options=UiAutomator2Options().load_capabilities(CAPS)
             )
+        logging.info("Driver created")
         mini_program = HospitalMiniProgram(driver, BRANCH, DEPARTMENT, SUBDEPARTMENT, DOCTOR, HEADERS)
         mini_program.run()
-        print("end")
+        logging.info("Driver ended")
