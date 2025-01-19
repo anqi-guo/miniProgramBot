@@ -74,7 +74,12 @@ class HospitalMiniProgram(BaseAutomation):
         error_message = errors.get(type(e), 'Unknown error occurred')
         logging.error(f'Error: {error_message}')
 
-        self.restart_program()
+            if type(e) == WebDriverException or type(e) == Exception:
+                self.clear_cache()
+            else:
+                self.restart_program()
+        except Exception:
+            logging.error("Error on handling errors")
 
     def restart_program(self):
         try:
