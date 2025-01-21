@@ -14,6 +14,7 @@ SUBDEPARTMENT = os.getenv("SUBDEPARTMENT")
 DOCTOR = os.getenv("DOCTOR")
 CAPS = ast.literal_eval(os.getenv('CAPS'))
 HEADERS = ast.literal_eval(os.getenv("HEADERS"))
+ALARM = os.getenv("ALARM")
 
 if __name__ == "__main__":
     while True:
@@ -22,6 +23,6 @@ if __name__ == "__main__":
                 options=UiAutomator2Options().load_capabilities(CAPS)
             )
         logging.critical("Driver created")
-        mini_program = HospitalMiniProgram(driver, BRANCH, DEPARTMENT, SUBDEPARTMENT, DOCTOR, HEADERS)
+        mini_program = HospitalMiniProgram(driver, BRANCH, DEPARTMENT, SUBDEPARTMENT, DOCTOR, HEADERS, ALARM)
         mini_program.run()
         logging.critical("Driver ended")

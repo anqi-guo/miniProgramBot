@@ -14,7 +14,7 @@ from log import setup_logging
 setup_logging()
 
 class HospitalMiniProgram(BaseAutomation):
-    def __init__(self, driver, branch, department, subdepartment, doctor, headers):
+    def __init__(self, driver, branch, department, subdepartment, doctor, headers, music):
         super().__init__(driver)
         self.driver = driver
         self.headers = headers
@@ -24,7 +24,7 @@ class HospitalMiniProgram(BaseAutomation):
         self.doctor = doctor
         self.homepage = Homepage(driver)
         self.login_page = LoginPage(driver)
-        self.booking = Booking(driver, headers)
+        self.booking = Booking(driver, headers, music)
         self.search_cnt = 0
 
     def run(self):

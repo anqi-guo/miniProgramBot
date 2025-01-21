@@ -3,3 +3,4 @@ Appium-Python-Client~=4.4.0
 selenium~=4.27.1
 requests~=2.32.3
 easyocr~=1.7.2
+pygame~=2.6.1

@@ -2,12 +2,20 @@ from BaseAutomation import BaseAutomation
 from selenium.webdriver.common.by import By
 from verification_handler import VerificationHandler
 import logging
+import pygame
+
+
+def play_sound(music):
+    pygame.mixer.init()
+    pygame.mixer.music.load(music)
+    pygame.mixer.music.play()
 
 
 class Booking(BaseAutomation):
-    def __init__(self, driver, headers):
+    def __init__(self, driver, headers, music):
         super().__init__(driver)
         self.verification_handler = VerificationHandler(driver, headers)
+        self.music = music
 
     def select_branch(self, branch):
         try:
@@ -72,6 +80,7 @@ class Booking(BaseAutomation):
             raise
 
     def confirm_booking(self):
+        play_sound(music=self.music)
         while True:
             try:
                 self.verification_handler.send_verification_code()
